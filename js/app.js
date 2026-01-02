@@ -403,7 +403,7 @@ export const App = {
                  cals: parseFloat(item.cals) || 0,
                  macros: item.macros || {p:0, c:0, f:0, fib:0},
                  micros: item.micros || { sodium: 0, sugar: 0, potassium: 0, vitamins: {} },
-                 score: 5, // Default score
+                 score: item.score || 5, // Use AI score or default
                  category: Input.cat,
                  timestamp: timestamp, // Grouped by same time
                  type: 'food'
