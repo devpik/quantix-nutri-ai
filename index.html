@@ -703,48 +703,28 @@
                     <div id="inp-area-review" class="hidden space-y-4 animate-fade-in">
                         <div class="bg-brand-50 dark:bg-brand-900/10 p-4 rounded-xl border border-brand-100 dark:border-brand-800/30">
                             <h4 class="text-xs font-bold text-brand-600 uppercase mb-3 flex items-center gap-2">
-                                <i class="fas fa-edit"></i> Revisar Item
+                                <i class="fas fa-edit"></i> Revisar Itens Identificados
                             </h4>
                             
-                            <!-- Editable Description & Recalculate -->
-                            <div class="mb-3">
-                                <label class="text-[10px] text-gray-400 font-bold uppercase">Nome / Descrição</label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="rev-desc" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm font-bold outline-none">
-                                    <button onclick="App.recalculateReview()" id="btn-recalc" class="px-3 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shadow-sm" title="Recalcular com IA">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </div>
-                                <p class="text-[9px] text-gray-400 mt-1">Edite o nome e clique no ícone azul para recalcular.</p>
+                            <div id="review-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1 custom-scrollbar">
+                                <!-- Items will be injected here -->
                             </div>
 
-                            <!-- Editable Stats -->
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <div>
-                                    <label class="text-[10px] text-gray-400 font-bold uppercase">Calorias</label>
-                                    <input type="number" id="rev-cals" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm outline-none">
-                                </div>
-                                <div class="grid grid-cols-3 gap-1">
-                                    <div>
-                                        <label class="text-[9px] text-blue-500 font-bold uppercase text-center block">Prot</label>
-                                        <input type="number" id="rev-p" class="w-full text-center bg-white dark:bg-gray-800 rounded-lg p-2 text-xs border border-gray-100 dark:border-gray-700">
-                                    </div>
-                                    <div>
-                                        <label class="text-[9px] text-green-500 font-bold uppercase text-center block">Carb</label>
-                                        <input type="number" id="rev-c" class="w-full text-center bg-white dark:bg-gray-800 rounded-lg p-2 text-xs border border-gray-100 dark:border-gray-700">
-                                    </div>
-                                    <div>
-                                        <label class="text-[9px] text-yellow-500 font-bold uppercase text-center block">Gord</label>
-                                        <input type="number" id="rev-f" class="w-full text-center bg-white dark:bg-gray-800 rounded-lg p-2 text-xs border border-gray-100 dark:border-gray-700">
-                                    </div>
-                                </div>
-                            </div>
+                            <button onclick="App.addManualReviewItem()" class="mt-3 w-full py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-xs font-bold text-gray-500 hover:text-brand-500 hover:border-brand-500 transition">
+                                + Adicionar Item Manual
+                            </button>
                         </div>
                         
+                        <!-- Totals Summary -->
+                        <div class="flex justify-between items-center px-2">
+                             <span class="text-xs font-bold text-gray-500">Total Estimado:</span>
+                             <span id="review-total-cals" class="text-xl font-black text-brand-600">0 kcal</span>
+                        </div>
+
                         <div class="flex gap-2">
                             <button onclick="App.cancelReview()" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">Cancelar</button>
                             <button onclick="App.confirmReview()" class="flex-[2] py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg flex justify-center items-center gap-2">
-                                <i class="fas fa-save"></i> Confirmar
+                                <i class="fas fa-save"></i> Confirmar Tudo
                             </button>
                         </div>
                     </div>

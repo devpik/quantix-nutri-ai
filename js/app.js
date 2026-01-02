@@ -10,6 +10,8 @@ import { API } from './services/api.js';
 // 6. MAIN APP CONTROLLER
 // =========================================================================
 export const App = {
+    reviewItems: [], // New state for multi-item review
+
     init: () => {
         moment.locale('pt-br');
         // Register PWA Service Worker
@@ -289,10 +291,147 @@ export const App = {
     suggestMeal: API.suggestMeal,
     fridgeClearoutAI: API.fridgeClearoutAI,
     analyzeAI: API.analyzeAI,
-    recalculateReview: API.recalculateReview,
-    confirmReview: API.confirmReview,
-    cancelReview: API.cancelReview,
+    recalculateReview: API.recalculateReview, // Deprecated, will be overridden
+    confirmReview: API.confirmReview, // Deprecated, will be overridden
+    cancelReview: API.cancelReview, // Deprecated, will be overridden
     analyzeExerciseAI: API.analyzeExerciseAI,
+
+    // --- NEW: REVIEW LOGIC ---
+    initReview: (items) => {
+        App.reviewItems = items || [];
+
+        // Hide Normal Input, Show Review
+        document.getElementById('inp-wrapper-normal').classList.add('hidden');
+        document.getElementById('inp-area-review').classList.remove('hidden');
+
+        App.renderReviewList();
+        App.recalculateTotals();
+    },
+
+    renderReviewList: () => {
+        const list = document.getElementById('review-list');
+        list.innerHTML = '';
+
+        if (App.reviewItems.length === 0) {
+            list.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">Nenhum item identificado.</p>';
+            return;
+        }
+
+        App.reviewItems.forEach((item, index) => {
+            const el = document.createElement('div');
+            el.className = "bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative animate-slide-up";
+
+            // Safe helper for macros
+            const m = item.macros || {p:0, c:0, f:0};
+
+            el.innerHTML = `
+                <div class="flex justify-between items-start mb-2 gap-2">
+                    <input type="text" value="${item.desc}"
+                        onchange="App.updateReviewItem(${index}, 'desc', this.value)"
+                        class="flex-1 bg-transparent font-bold text-sm text-gray-800 dark:text-white border-b border-dashed border-gray-300 dark:border-gray-600 focus:border-brand-500 outline-none pb-1" placeholder="Nome do item">
+
+                    <button onclick="App.removeReviewItem(${index})" class="text-gray-400 hover:text-red-500 p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 items-center">
+                    <div class="relative">
+                        <input type="number" value="${item.weight || 0}"
+                            onchange="App.updateReviewItem(${index}, 'weight', this.value)"
+                            class="w-full bg-gray-50 dark:bg-gray-900 rounded-lg py-1.5 px-2 text-xs font-bold text-gray-600 dark:text-gray-300 outline-none focus:ring-1 focus:ring-brand-500">
+                        <span class="absolute right-2 top-1.5 text-[10px] text-gray-400">g</span>
+                    </div>
+
+                    <div class="relative">
+                        <input type="number" value="${item.cals || 0}"
+                             onchange="App.updateReviewItem(${index}, 'cals', this.value)"
+                             class="w-full bg-gray-50 dark:bg-gray-900 rounded-lg py-1.5 px-2 text-xs font-black text-brand-600 outline-none focus:ring-1 focus:ring-brand-500">
+                        <span class="absolute right-2 top-1.5 text-[10px] text-brand-400">kcal</span>
+                    </div>
+                </div>
+            `;
+            list.appendChild(el);
+        });
+    },
+
+    updateReviewItem: (index, field, value) => {
+        if (!App.reviewItems[index]) return;
+
+        if (field === 'cals' || field === 'weight') {
+             App.reviewItems[index][field] = parseFloat(value) || 0;
+        } else {
+             App.reviewItems[index][field] = value;
+        }
+        App.recalculateTotals();
+    },
+
+    removeReviewItem: (index) => {
+        App.reviewItems.splice(index, 1);
+        App.renderReviewList();
+        App.recalculateTotals();
+    },
+
+    addManualReviewItem: () => {
+        App.reviewItems.push({
+             desc: "Novo Item",
+             weight: 100,
+             cals: 100,
+             macros: { p:0, c:0, f:0 },
+             micros: { sodium: 0, sugar: 0, potassium: 0, vitamins: {} }
+        });
+        App.renderReviewList();
+        App.recalculateTotals();
+    },
+
+    recalculateTotals: () => {
+         let total = 0;
+         App.reviewItems.forEach(i => total += (parseFloat(i.cals) || 0));
+         document.getElementById('review-total-cals').innerText = Math.round(total) + ' kcal';
+    },
+
+    confirmReview: () => {
+        if(App.reviewItems.length === 0) return alert("Adicione pelo menos um item.");
+
+        const timestamp = Date.now();
+        let totalCals = 0;
+
+        App.reviewItems.forEach(item => {
+             const data = {
+                 desc: item.desc,
+                 weight: parseFloat(item.weight) || 0,
+                 cals: parseFloat(item.cals) || 0,
+                 macros: item.macros || {p:0, c:0, f:0, fib:0},
+                 micros: item.micros || { sodium: 0, sugar: 0, potassium: 0, vitamins: {} },
+                 score: 5, // Default score
+                 category: Input.cat,
+                 timestamp: timestamp, // Grouped by same time
+                 type: 'food'
+             };
+             App.addMealToDB(data);
+             totalCals += data.cals;
+        });
+
+        // Close and Reset
+        document.getElementById('inp-area-review').classList.add('hidden');
+        document.getElementById('inp-wrapper-normal').classList.remove('hidden');
+        App.reviewItems = [];
+        Modal.close('add-food');
+
+        // Custom Feedback
+        const msg = App.reviewItems.length > 1
+            ? `Registrados ${App.reviewItems.length} itens (${Math.round(totalCals)} kcal)`
+            : `Registrado com sucesso!`;
+
+        // Use a small timeout to ensure alert doesn't block UI refresh if any
+        setTimeout(() => alert("Refeição registrada com sucesso!"), 100);
+    },
+
+    cancelReview: () => {
+         document.getElementById('inp-area-review').classList.add('hidden');
+         document.getElementById('inp-wrapper-normal').classList.remove('hidden');
+         App.reviewItems = [];
+    },
 
     openCamera: UI.openCamera,
     closeCamera: UI.closeCamera,
