@@ -638,6 +638,35 @@
             </button>
         </nav>
 
+        <!-- MODAL: API KEY INPUT -->
+        <div id="modal-apikey" class="modal-overlay z-[70]">
+            <div class="modal-content pb-6">
+                <div class="flex justify-center pt-2 pb-4">
+                    <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="px-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Configurar API</h3>
+                    </div>
+
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30 mb-4">
+                        <p class="text-xs text-blue-700 dark:text-blue-300">
+                            Para usar a IA, você precisa de uma chave gratuita do Google Gemini.
+                        </p>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="block mt-2 text-xs font-bold text-blue-600 underline hover:text-blue-800">Obter Chave Aqui &rarr;</a>
+                    </div>
+
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Sua API Key</label>
+                    <input type="text" id="inp-apikey" placeholder="Cole sua chave aqui..." class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 mb-4 outline-none border border-gray-200 dark:border-gray-700">
+
+                    <button onclick="App.saveApiKey()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press">
+                        Salvar e Iniciar
+                    </button>
+                    <p class="text-[9px] text-center text-gray-400 mt-4">Sua chave fica salva apenas no seu dispositivo.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- MODAL: ADD FOOD (Bottom Sheet) -->
         <div id="modal-add-food" class="modal-overlay">
             <div class="modal-content pb-6">
@@ -740,8 +769,11 @@
                                 <input type="file" id="inp-image" class="hidden" accept="image/*" onchange="App.handleImagePreview(this)">
                             </div>
                             
-                            <div class="space-y-2">
+                            <div class="space-y-2 relative">
                                 <textarea id="ai-desc" placeholder="Descreva sua refeição em detalhes (ex: 2 pratos de arroz, 2 fatias de tender e 3 batatas cozidas)..." class="input-field w-full h-32 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
+                                <button onclick="Voice.start('ai-desc')" id="btn-mic-ai-desc" class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-brand-500 flex items-center justify-center transition">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
                             </div>
                             
                             <!-- Preview -->
@@ -835,7 +867,12 @@
                         <button onclick="App.clearImage('fridge')" class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow"><i class="fas fa-times text-xs"></i></button>
                     </div>
 
-                    <textarea id="fridge-ingredients" placeholder="Ex: 2 ovos, meio tomate, um pouco de queijo e sobras de frango..." class="input-field w-full h-24 rounded-2xl p-3 text-sm outline-none resize-none mb-4"></textarea>
+                    <div class="relative mb-4">
+                        <textarea id="fridge-ingredients" placeholder="Ex: 2 ovos, meio tomate, um pouco de queijo e sobras de frango..." class="input-field w-full h-24 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
+                        <button onclick="Voice.start('fridge-ingredients')" id="btn-mic-fridge-ingredients" class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-blue-500 flex items-center justify-center transition">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
                     
                     <button onclick="App.fridgeClearoutAI()" id="btn-fridge-analyze" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold shadow-lg btn-press flex justify-center items-center gap-2">
                         <span>Gerar Receita</span> <i class="fas fa-magic"></i>

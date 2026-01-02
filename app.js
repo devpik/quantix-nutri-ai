@@ -3,7 +3,7 @@
     // 1. SYSTEM CONFIGURATION & OFFLINE DB
     // =========================================================================
     const CONFIG = {
-        apiKey: localStorage.getItem('quantix_ultimate_v2_api_key') || "AIzaSyCbmeiRTSo_B18fD8BoRyp61NMQQT7QDpU",
+        apiKey: localStorage.getItem('quantix_ultimate_v2_api_key'),
         dbPrefix: "quantix_ultimate_v2_",
         version: "2.0.0"
     };
@@ -418,6 +418,11 @@
             // Load Settings
             if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
 
+            // Check API Key
+            if (!CONFIG.apiKey) {
+                setTimeout(() => Modal.open('apikey'), 1000);
+            }
+
             // Render Quick Adds (Offline DB)
             const quickContainer = document.getElementById('quick-add-container');
             OFFLINE_FOOD_DB.forEach(item => {
@@ -453,6 +458,17 @@
 
             // Event Listener para fechar modal com ESC
             document.addEventListener('keydown', (e) => { if(e.key === 'Escape') Modal.closeAll(); });
+        },
+
+        saveApiKey: () => {
+            const key = document.getElementById('inp-apikey').value;
+            if (key && key.trim() !== "") {
+                localStorage.setItem('quantix_ultimate_v2_api_key', key.trim());
+                alert("API Key salva com sucesso! O aplicativo será recarregado.");
+                location.reload();
+            } else {
+                alert("Por favor, insira uma chave válida.");
+            }
         },
 
         // --- ONBOARDING LOGIC ---
@@ -1573,6 +1589,65 @@
     // =========================================================================
     // 8. HELPERS
     // =========================================================================
+    const Voice = {
+        recognition: null,
+        targetId: null,
+
+        init: () => {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                Voice.recognition = new SpeechRecognition();
+                Voice.recognition.lang = 'pt-BR';
+                Voice.recognition.continuous = false;
+                Voice.recognition.interimResults = false;
+
+                Voice.recognition.onstart = () => {
+                    const btn = document.getElementById('btn-mic-' + Voice.targetId);
+                    if(btn) btn.classList.add('animate-pulse', 'text-red-500');
+                };
+
+                Voice.recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    if (Voice.targetId) {
+                        const el = document.getElementById(Voice.targetId);
+                        if (el) {
+                            const currentVal = el.value ? el.value + " " : "";
+                            el.value = (currentVal + transcript).trim();
+                        }
+                    }
+                };
+
+                Voice.recognition.onerror = (event) => {
+                    console.error("Voice Error", event.error);
+                    alert("Erro no reconhecimento de voz: " + event.error);
+                    Voice.stop();
+                };
+
+                Voice.recognition.onend = () => {
+                    Voice.stop();
+                };
+            } else {
+                alert("Seu navegador não suporta reconhecimento de voz.");
+            }
+        },
+
+        start: (id) => {
+            if (!Voice.recognition) Voice.init();
+            if (Voice.recognition) {
+                Voice.targetId = id;
+                Voice.recognition.start();
+            }
+        },
+
+        stop: () => {
+            if (Voice.targetId) {
+                const btn = document.getElementById('btn-mic-' + Voice.targetId);
+                if(btn) btn.classList.remove('animate-pulse', 'text-red-500');
+                Voice.targetId = null;
+            }
+        }
+    };
+
     const Modal = {
         open: (id) => {
             document.getElementById('modal-' + id).classList.add('active');
