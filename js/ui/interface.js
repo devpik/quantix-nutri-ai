@@ -79,7 +79,7 @@ export const Input = {
     setMode: (m) => {
         Input.mode = m;
         // UI Toggle
-        ['ai', 'manual', 'exercise'].forEach(type => {
+        ['ai', 'manual', 'combos', 'exercise'].forEach(type => {
             const btn = document.getElementById(`btn-mode-${type}`);
             const area = document.getElementById(`inp-area-${type}`);
 
@@ -100,6 +100,11 @@ export const Input = {
         if (m !== 'exercise') {
             document.getElementById('btn-mode-exercise').classList.add('text-blue-500', 'border-blue-100', 'bg-blue-50');
             document.getElementById('btn-mode-exercise').classList.remove('bg-gray-100', 'text-gray-500');
+        }
+
+        // Trigger combos render if selected
+        if(m === 'combos' && window.App && App.renderCombosList) {
+            App.renderCombosList();
         }
     },
 
