@@ -67,5 +67,7 @@ export const DB = {
         return allStats;
     },
 
-    getStreak: () => DB.get('streak', { current: 0, lastLogin: null, max: 0 })
+    getStreak: () => DB.get('streak', { current: 0, lastLogin: null, max: 0 }),
+
+    getCombos: () => DB.get('combos', [])
 };

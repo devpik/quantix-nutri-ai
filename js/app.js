@@ -395,8 +395,42 @@ export const App = {
          document.getElementById('review-total-cals').innerText = Math.round(total) + ' kcal';
     },
 
+    toggleSaveCombo: () => {
+        const chk = document.getElementById('check-save-combo');
+        const inp = document.getElementById('inp-combo-name');
+        if (chk.checked) {
+            inp.classList.remove('hidden');
+            inp.focus();
+        } else {
+            inp.classList.add('hidden');
+        }
+    },
+
     confirmReview: () => {
         if(App.reviewItems.length === 0) return alert("Adicione pelo menos um item.");
+
+        // --- COMBOS LOGIC ---
+        const chkCombo = document.getElementById('check-save-combo');
+        if (chkCombo.checked) {
+            const name = document.getElementById('inp-combo-name').value.trim();
+            if (!name) return alert("Por favor, dê um nome para o seu Combo.");
+
+            // Save Combo
+            const combos = DB.getCombos();
+            const newCombo = {
+                id: Date.now(),
+                name: name,
+                items: JSON.parse(JSON.stringify(App.reviewItems)) // Deep copy
+            };
+            combos.push(newCombo);
+            DB.set('combos', combos);
+
+            // Reset UI for combo
+            chkCombo.checked = false;
+            document.getElementById('inp-combo-name').value = '';
+            document.getElementById('inp-combo-name').classList.add('hidden');
+        }
+        // --------------------
 
         const timestamp = Date.now();
         let totalCals = 0;
@@ -436,6 +470,85 @@ export const App = {
          document.getElementById('inp-area-review').classList.add('hidden');
          document.getElementById('inp-wrapper-normal').classList.remove('hidden');
          App.reviewItems = [];
+    },
+
+    // --- COMBOS MANAGEMENT ---
+    renderCombosList: () => {
+        const list = document.getElementById('combo-list');
+        const combos = DB.getCombos();
+
+        list.innerHTML = '';
+
+        if (combos.length === 0) {
+            list.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">Você ainda não salvou nenhum combo.</p>';
+            return;
+        }
+
+        combos.forEach(c => {
+            let totalCals = 0;
+            let totalP = 0, totalC = 0, totalF = 0;
+
+            c.items.forEach(i => {
+                totalCals += (parseFloat(i.cals) || 0);
+                if(i.macros) {
+                    totalP += (parseFloat(i.macros.p) || 0);
+                    totalC += (parseFloat(i.macros.c) || 0);
+                    totalF += (parseFloat(i.macros.f) || 0);
+                }
+            });
+
+            const el = document.createElement('div');
+            el.className = "bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex justify-between items-center";
+            el.innerHTML = `
+                <div>
+                    <h5 class="text-sm font-bold text-gray-800 dark:text-white">${c.name}</h5>
+                    <p class="text-[10px] text-gray-400 font-bold">${c.items.length} itens • ${Math.round(totalCals)} kcal</p>
+                    <p class="text-[9px] text-gray-300 mt-1">P:${Math.round(totalP)} C:${Math.round(totalC)} G:${Math.round(totalF)}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="App.deleteCombo(${c.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                    <button onclick="App.addCombo(${c.id})" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center transition shadow-sm border border-green-100">
+                        <i class="fas fa-plus text-xs"></i>
+                    </button>
+                </div>
+            `;
+            list.appendChild(el);
+        });
+    },
+
+    addCombo: (id) => {
+        const combos = DB.getCombos();
+        const combo = combos.find(c => c.id === id);
+        if(!combo) return;
+
+        const timestamp = Date.now();
+
+        combo.items.forEach(item => {
+             const data = {
+                 desc: item.desc,
+                 weight: parseFloat(item.weight) || 0,
+                 cals: parseFloat(item.cals) || 0,
+                 macros: item.macros || {p:0, c:0, f:0, fib:0},
+                 micros: item.micros || { sodium: 0, sugar: 0, potassium: 0, vitamins: {} },
+                 score: item.score || 5,
+                 category: Input.cat,
+                 timestamp: timestamp, // All items grouped
+                 type: 'food'
+             };
+             App.addMealToDB(data);
+        });
+
+        Modal.close('add-food');
+        alert(`Combo "${combo.name}" adicionado em ${Input.cat}!`);
+    },
+
+    deleteCombo: (id) => {
+        if(!confirm("Excluir este combo?")) return;
+        const combos = DB.getCombos().filter(c => c.id !== id);
+        DB.set('combos', combos);
+        App.renderCombosList();
     },
 
     openCamera: UI.openCamera,
