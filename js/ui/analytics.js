@@ -329,12 +329,13 @@ export const Analytics = {
         const createBar = (label, val, max, unit) => {
             const wrapper = document.createElement('div');
             wrapper.className = "mb-2";
+            // Increased height to h-16 (was h-10) to accommodate labels
             wrapper.innerHTML = `
                 <div class="flex justify-between text-[10px] font-bold mb-1">
                     <span class="text-gray-500 uppercase">${label}</span>
                     <span class="${val > max ? 'text-red-500' : 'text-gray-500'}">${Math.round(val)} / ${max}${unit}</span>
                 </div>
-                <div class="h-10 w-full relative">
+                <div class="h-16 w-full relative">
                     <canvas id="chart-micro-${label.toLowerCase()}"></canvas>
                 </div>
             `;
@@ -357,12 +358,16 @@ export const Analytics = {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: { bottom: 20 }
+                    },
                     plugins: { legend: { display: false } },
                     scales: {
                         x: {
                             display: true,
                             max: Math.max(val * 1.2, max * 1.2),
-                            grid: { display: false }
+                            grid: { display: false },
+                            ticks: { autoSkip: false, maxRotation: 0, minRotation: 0 }
                         },
                         y: { display: false }
                     }

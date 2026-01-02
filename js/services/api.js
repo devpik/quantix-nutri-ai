@@ -156,6 +156,11 @@ export const API = {
                 Para cada componente, estime seu peso em gramas, calorias e macros.
                 Estime também Sódio (mg) e Açúcar (g) para cada item.
 
+                CALCULE o "score" (Qualidade Alimentar) de 1 a 10 para CADA item, considerando:
+                - 1-4: Alimentos ultraprocessados, alto açúcar/sódio, frituras ou embutidos.
+                - 5-7: Refeições mistas, "normais" mas com alguns processados ou desequilíbrio leve.
+                - 8-10: Alimentos in natura, ricos em fibras, vegetais, frutas, proteínas magras e gorduras boas.
+
                 Retorne APENAS um JSON com a seguinte estrutura de Array:
                 {
                   "items": [
@@ -164,7 +169,8 @@ export const API = {
                       "weight": 100,
                       "cals": 0,
                       "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
-                      "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": {} }
+                      "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": {} },
+                      "score": 5
                     }
                   ],
                   "total_cals": 0
