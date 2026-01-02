@@ -4,10 +4,43 @@ import { Profile } from '../logic/profile.js';
 import { Input, UI, Modal } from '../ui/interface.js';
 import { Gamification } from '../logic/gamification.js';
 import { App } from '../app.js';
+import { Context } from './context.js';
 
 // reviewData moved to App state (App.reviewItems)
 
 export const API = {
+    sendChatMessage: async (userMessage) => {
+        const p = DB.getProfile();
+        // Check credits or if chat is free (assuming free or same credit pool)
+        if (p.credits <= 0) throw new Error("Sem créditos IA!");
+
+        const systemPrompt = Context.generateSystemPrompt();
+
+        const payload = {
+            contents: [{
+                parts: [
+                    { text: systemPrompt },
+                    { text: "Mensagem do Usuário: " + userMessage }
+                ]
+            }]
+        };
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+        if (!json.candidates || !json.candidates[0]) {
+            console.error("Erro na API Chat:", json);
+            throw new Error("Erro na comunicação com a IA.");
+        }
+
+        Profile.updateApiUsage(json.usageMetadata);
+        return json.candidates[0].content.parts[0].text;
+    },
+
     suggestMeal: async () => {
         const p = DB.getProfile();
         if (p.credits <= 0) return alert("Sem créditos IA!");

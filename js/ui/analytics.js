@@ -1,4 +1,5 @@
 import { DB } from '../data/database.js';
+import { ChatUI } from './chat.js';
 
 // =========================================================================
 // 7. ANALYTICS RENDERER
@@ -18,6 +19,12 @@ export const Analytics = {
                 btn.className = "flex-1 py-1.5 rounded-lg text-[10px] font-bold transition text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800";
             }
         });
+
+        // Update Chat Context Indicator
+        if (ChatUI && typeof ChatUI.updateIndicator === 'function') {
+            ChatUI.updateIndicator();
+        }
+
         Analytics.render();
     },
 

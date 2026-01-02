@@ -4,7 +4,9 @@ import { Profile } from './logic/profile.js';
 import { Gamification } from './logic/gamification.js';
 import { Analytics } from './ui/analytics.js';
 import { Modal, Input, Voice, UI } from './ui/interface.js';
+import { ChatUI } from './ui/chat.js';
 import { API } from './services/api.js';
+import { Context } from './services/context.js';
 
 // =========================================================================
 // 6. MAIN APP CONTROLLER
@@ -26,6 +28,9 @@ export const App = {
         if (!CONFIG.apiKey) {
             setTimeout(() => Modal.open('apikey'), 1000);
         }
+
+        // Init Chat UI
+        ChatUI.init();
 
         // Render Quick Adds (Offline DB)
         const quickContainer = document.getElementById('quick-add-container');
@@ -592,6 +597,8 @@ window.Profile = Profile;
 window.Analytics = Analytics;
 window.Voice = Voice;
 window.Gamification = Gamification;
+window.ChatUI = ChatUI;
+window.Context = Context;
 
 // Ensure init is called correctly handling module timing
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
