@@ -1,0 +1,17 @@
+{
+  "name": "QuantixNutri Ultimate AI",
+  "short_name": "QuantixNutri",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#16a34a",
+  "description": "Nutrição inteligente com IA",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2909/2909841.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
