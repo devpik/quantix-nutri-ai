@@ -943,6 +943,65 @@
             }
         },
 
+        // --- VOICE RECOGNITION ---
+        recognition: null,
+        toggleVoice: (elementId) => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert("Seu navegador não suporta reconhecimento de voz.");
+
+            const btn = document.getElementById(`btn-mic-${elementId}`);
+            const input = document.getElementById(elementId);
+
+            if (App.recognition) {
+                // If already running, stop it
+                App.recognition.stop();
+                App.recognition = null;
+                return;
+            }
+
+            App.recognition = new SpeechRecognition();
+            App.recognition.lang = 'pt-BR';
+            App.recognition.continuous = false;
+            App.recognition.interimResults = false;
+
+            App.recognition.onstart = () => {
+                btn.classList.add('animate-pulse', 'text-red-500', 'bg-white', 'border-2', 'border-red-500');
+                btn.classList.remove('text-white', 'bg-brand-500', 'bg-blue-500', 'text-blue-500'); // Reset potential classes
+                // Keep minimal layout classes
+            };
+
+            App.recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                // Append text (with space if needed)
+                if (input.value && !input.value.endsWith(' ')) input.value += ' ';
+                input.value += text;
+            };
+
+            App.recognition.onend = () => {
+                // Restore Button Style (Quick & Dirty reset based on IDs to guess original color)
+                btn.classList.remove('animate-pulse', 'text-red-500', 'bg-white', 'border-2', 'border-red-500');
+
+                if(elementId === 'ai-desc') {
+                    btn.classList.add('bg-brand-500', 'text-white');
+                } else if(elementId === 'fridge-ingredients') {
+                    btn.classList.add('bg-blue-500', 'text-white');
+                } else {
+                    // Exercise
+                    btn.classList.add('text-blue-500');
+                }
+
+                App.recognition = null;
+            };
+
+            App.recognition.onerror = (event) => {
+                console.error("Speech Error", event.error);
+                alert("Erro ao reconhecer áudio: " + event.error);
+                App.recognition.stop();
+            };
+
+            App.recognition.start();
+        },
+
         // MODIFIED: Now triggers review mode
         analyzeAI: async () => {
             const p = DB.getProfile();
