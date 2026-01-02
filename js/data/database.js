@@ -39,9 +39,11 @@ export const DB = {
         const p = DB.get('profile', {
             name: '', weight: 70, height: 170, age: 30, gender: 'male',
             target: 2000, fiberTarget: 25, strategy: 'balanced',
+            microTargets: { sodium: 2300, sugar: 50, vitamins: { a: 100, c: 100, d: 100 } },
             customMacros: { p: 30, c: 40, f: 30 }, credits: 50, xp: 0,
             level: 1, badges: [], weightHistory: [], measurementsHistory: [], onboardingDone: false
         });
+        if (!p.microTargets) p.microTargets = { sodium: 2300, sugar: 50, vitamins: { a: 100, c: 100, d: 100 } };
         if (!p.measurementsHistory) p.measurementsHistory = [];
         if (!p.weightHistory) p.weightHistory = [];
         return p;

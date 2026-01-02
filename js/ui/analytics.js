@@ -277,6 +277,101 @@ export const Analytics = {
         const projectedLoss = 1.2;
         document.getElementById('proj-weight').innerText = (p.weight - projectedLoss).toFixed(1);
         document.getElementById('proj-diff').innerText = `-${projectedLoss} kg`;
+
+        // 5. Metabolic Health (Micros)
+        Analytics.renderMetabolicHealth(p, meals, daysToRender);
+    },
+
+    renderMetabolicHealth: (p, meals, range) => {
+        const container = document.getElementById('metabolic-bars-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        // Calculate Average Intake for the range (or Today if range=1)
+        let totalSodium = 0;
+        let totalSugar = 0;
+        let countDays = 0;
+
+        // Iterate days in range
+        for (let i = range - 1; i >= 0; i--) {
+            const d = moment().subtract(i, 'days');
+            const k = d.format('YYYY-MM-DD');
+            const dayMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
+
+            if (dayMeals.length > 0) {
+                countDays++;
+                dayMeals.forEach(m => {
+                    if (m.micros) {
+                        totalSodium += (m.micros.sodium || 0);
+                        totalSugar += (m.micros.sugar || 0);
+                    }
+                });
+            }
+        }
+
+        const avgSodium = countDays > 0 ? totalSodium / countDays : 0;
+        const avgSugar = countDays > 0 ? totalSugar / countDays : 0;
+
+        // Targets
+        const targetSodium = (p.microTargets && p.microTargets.sodium) || 2300;
+        const targetSugar = (p.microTargets && p.microTargets.sugar) || 50;
+
+        // Render Bars using Canvas (Chart.js Horizontal Bar)
+        // Since we want traffic light, we can use a helper to determine color
+        const getHealthColor = (val, max) => {
+            const pct = val / max;
+            if (pct < 0.7) return '#22c55e'; // Green
+            if (pct <= 1.0) return '#eab308'; // Yellow
+            return '#ef4444'; // Red
+        };
+
+        // Create Canvas Elements
+        const createBar = (label, val, max, unit) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = "mb-2";
+            wrapper.innerHTML = `
+                <div class="flex justify-between text-[10px] font-bold mb-1">
+                    <span class="text-gray-500 uppercase">${label}</span>
+                    <span class="${val > max ? 'text-red-500' : 'text-gray-500'}">${Math.round(val)} / ${max}${unit}</span>
+                </div>
+                <div class="h-10 w-full relative">
+                    <canvas id="chart-micro-${label.toLowerCase()}"></canvas>
+                </div>
+            `;
+            container.appendChild(wrapper);
+
+            const ctx = wrapper.querySelector('canvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Média Diária'],
+                    datasets: [{
+                        label: label,
+                        data: [val],
+                        backgroundColor: getHealthColor(val, max),
+                        barThickness: 20,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            display: true,
+                            max: Math.max(val * 1.2, max * 1.2),
+                            grid: { display: false }
+                        },
+                        y: { display: false }
+                    }
+                }
+            });
+        };
+
+        createBar('Sódio', avgSodium, targetSodium, 'mg');
+        createBar('Açúcar', avgSugar, targetSugar, 'g');
     },
 
     drawChart: (id, type, data, extraOptions = {}) => {

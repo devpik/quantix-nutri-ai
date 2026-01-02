@@ -32,7 +32,13 @@ export const API = {
         };
 
         try {
-            const prompt = `Com base nos macros que faltam (${rem.cals}kcal, ${rem.p}g prot, ${rem.c}g carbo, ${rem.f}g gord), sugira ALIMENTOS SIMPLES e práticos (ex: frango grelhado, ovo cozido, arroz, fruta). NÃO sugira receitas complexas ou pratos gourmet. Seja direto e cite 2 ou 3 opções individuais.`;
+            const prompt = `
+                Com base nos macros que faltam (${rem.cals}kcal, ${rem.p}g prot, ${rem.c}g carbo, ${rem.f}g gord), sugira ALIMENTOS SIMPLES e práticos (ex: frango grelhado, ovo cozido, arroz, fruta).
+
+                IMPORTANTE: O usuário está monitorando saúde metabólica. Priorize alimentos com BAIXO Sódio e BAIXO Açúcar.
+
+                NÃO sugira receitas complexas ou pratos gourmet. Seja direto e cite 2 ou 3 opções individuais.
+            `;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
                 method: "POST",
@@ -146,8 +152,18 @@ export const API = {
 
                 IMPORTANTE: Se houver uma imagem, use-a como referência principal. Se não houver, baseie-se inteiramente na descrição textual fornecida para calcular as quantidades.
                 Considere que o usuário indicou um fator de porção de ${UI.portionSize}x sobre o que é descrito ou visível.
+
+                Estime também com precisão científica: Sódio (mg), Açúcar total (g) e principais Vitaminas.
+                Se o alimento for industrializado, considere a média de mercado.
+
                 Retorne APENAS um objeto JSON válido, sem formatação markdown, com a seguinte estrutura:
-                { "desc": "Nome curto", "cals": 0, "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 }, "score": 0 }
+                {
+                  "desc": "Nome curto",
+                  "cals": 0,
+                  "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
+                  "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": { "a": 0, "c": 0, "d": 0 } },
+                  "score": 0
+                }
             `;
 
             const payload = {
@@ -222,8 +238,15 @@ export const API = {
                 Você é um nutricionista preciso.
                 Analise APENAS com base neste texto: "${newDesc}". Contexto: ${Input.cat}.
                 Calcule as calorias e macros para este item.
+                Estime Sódio (mg) e Açúcar (g).
                 Retorne APENAS um JSON:
-                { "desc": "Nome curto", "cals": 0, "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 }, "score": 0 }
+                {
+                  "desc": "Nome curto",
+                  "cals": 0,
+                  "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
+                  "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": {} },
+                  "score": 0
+                }
             `;
 
             const payload = {
@@ -277,6 +300,7 @@ export const API = {
                 f: parseInt(document.getElementById('rev-f').value) || 0,
                 fib: 0
             },
+            micros: reviewData.micros || { sodium: 0, sugar: 0, potassium: 0, vitamins: {} },
             score: 5,
             category: Input.cat,
             timestamp: Date.now(),

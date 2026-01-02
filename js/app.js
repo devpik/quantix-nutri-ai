@@ -206,6 +206,13 @@ export const App = {
                 const time = moment(m.timestamp).format('HH:mm');
                 const isEx = m.type === 'exercise';
 
+                // Badges for High Sodium/Sugar
+                let badges = "";
+                if (!isEx && m.micros) {
+                    if (m.micros.sodium > 400) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-red-500" title="Alto Sódio"></span>`;
+                    if (m.micros.sugar > 15) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-orange-500" title="Alto Açúcar"></span>`;
+                }
+
                 const el = document.createElement('div');
                 el.className = "flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up";
                 el.innerHTML = `
@@ -214,7 +221,10 @@ export const App = {
                             <i class="fas ${isEx ? 'fa-running' : (m.category === 'Café da Manhã' ? 'fa-mug-hot' : 'fa-utensils')}"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-bold text-gray-800 dark:text-white truncate w-32 sm:w-48">${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h4>
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-white truncate w-32 sm:w-48">
+                                ${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                                ${badges}
+                            </h4>
                             <p class="text-[9px] text-gray-400 font-bold">${m.category || 'Atividade'} • ${time}</p>
                         </div>
                     </div>

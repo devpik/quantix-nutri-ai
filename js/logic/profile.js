@@ -81,6 +81,12 @@ export const Profile = {
         p.strategy = document.getElementById('prof-strategy').value;
         p.target = parseFloat(document.getElementById('prof-target').value) || 2000;
         p.fiberTarget = parseFloat(document.getElementById('prof-fiber').value) || 25;
+
+        // Micro Targets
+        if (!p.microTargets) p.microTargets = {};
+        p.microTargets.sodium = parseFloat(document.getElementById('prof-sodium').value) || 2300;
+        p.microTargets.sugar = parseFloat(document.getElementById('prof-sugar').value) || 50;
+
         // No input for API Key in profile, it is hardcoded or from localstorage default
 
         // Custom Macros
@@ -134,6 +140,11 @@ export const Profile = {
         document.getElementById('prof-strategy').value = p.strategy;
         document.getElementById('prof-target').value = p.target;
         document.getElementById('prof-fiber').value = p.fiberTarget;
+
+        if (p.microTargets) {
+            document.getElementById('prof-sodium').value = p.microTargets.sodium || 2300;
+            document.getElementById('prof-sugar').value = p.microTargets.sugar || 50;
+        }
 
         document.getElementById('cus-p').value = p.customMacros.p;
         document.getElementById('cus-c').value = p.customMacros.c;
