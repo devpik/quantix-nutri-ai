@@ -5,7 +5,7 @@ import { Input, UI, Modal } from '../ui/interface.js';
 import { Gamification } from '../logic/gamification.js';
 import { App } from '../app.js';
 
-let reviewData = null; // Module state
+// reviewData moved to App state (App.reviewItems)
 
 export const API = {
     suggestMeal: async () => {
@@ -150,19 +150,24 @@ export const API = {
                 Analise a seguinte descrição de refeição: "${desc}".
                 Contexto da refeição: ${Input.cat}.
 
-                IMPORTANTE: Se houver uma imagem, use-a como referência principal. Se não houver, baseie-se inteiramente na descrição textual fornecida para calcular as quantidades.
+                IMPORTANTE: Se houver uma imagem, use-a como referência principal. Analise a imagem e identifique TODOS os componentes distintos visíveis.
                 Considere que o usuário indicou um fator de porção de ${UI.portionSize}x sobre o que é descrito ou visível.
 
-                Estime também com precisão científica: Sódio (mg), Açúcar total (g) e principais Vitaminas.
-                Se o alimento for industrializado, considere a média de mercado.
+                Para cada componente, estime seu peso em gramas, calorias e macros.
+                Estime também Sódio (mg) e Açúcar (g) para cada item.
 
-                Retorne APENAS um objeto JSON válido, sem formatação markdown, com a seguinte estrutura:
+                Retorne APENAS um JSON com a seguinte estrutura de Array:
                 {
-                  "desc": "Nome curto",
-                  "cals": 0,
-                  "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
-                  "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": { "a": 0, "c": 0, "d": 0 } },
-                  "score": 0
+                  "items": [
+                    {
+                      "desc": "Nome do Item",
+                      "weight": 100,
+                      "cals": 0,
+                      "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
+                      "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": {} }
+                    }
+                  ],
+                  "total_cals": 0
                 }
             `;
 
@@ -197,19 +202,8 @@ export const API = {
 
             Profile.updateApiUsage(json.usageMetadata);
 
-            // FEATURE: Populate Review Area Instead of Adding Immediately
-            reviewData = result;
-
-            // Switch Views
-            document.getElementById('inp-wrapper-normal').classList.add('hidden');
-            document.getElementById('inp-area-review').classList.remove('hidden');
-
-            // Populate Fields
-            document.getElementById('rev-desc').value = result.desc;
-            document.getElementById('rev-cals').value = result.cals;
-            document.getElementById('rev-p').value = result.macros.p;
-            document.getElementById('rev-c').value = result.macros.c;
-            document.getElementById('rev-f').value = result.macros.f;
+            // Pass results to App for Review
+            App.initReview(result.items);
 
             // Deduct Credit
             p.credits--; DB.set('profile', p);
@@ -229,98 +223,16 @@ export const API = {
     },
 
     recalculateReview: async () => {
-         const newDesc = document.getElementById('rev-desc').value;
-         const btn = document.getElementById('btn-recalc');
-         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-         try {
-            const prompt = `
-                Você é um nutricionista preciso.
-                Analise APENAS com base neste texto: "${newDesc}". Contexto: ${Input.cat}.
-                Calcule as calorias e macros para este item.
-                Estime Sódio (mg) e Açúcar (g).
-                Retorne APENAS um JSON:
-                {
-                  "desc": "Nome curto",
-                  "cals": 0,
-                  "macros": { "p": 0, "c": 0, "f": 0, "fib": 0 },
-                  "micros": { "sodium": 0, "sugar": 0, "potassium": 0, "vitamins": {} },
-                  "score": 0
-                }
-            `;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }]
-            };
-
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            const json = await res.json();
-            Profile.updateApiUsage(json.usageMetadata);
-            if (!json.candidates || !json.candidates[0]) {
-                console.error("Erro na API Gemini:", json);
-                throw new Error("A IA não conseguiu processar a solicitação.");
-            }
-
-            let txt = json.candidates[0].content.parts[0].text;
-            // Added Markdown cleanup
-            txt = txt.replace(/```json/g, '').replace(/```/g, '');
-
-            const jsonMatch = txt.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("Resposta da IA inválida.");
-            const result = JSON.parse(jsonMatch[0]);
-
-            // Update Review Fields
-            reviewData = result;
-            document.getElementById('rev-desc').value = result.desc;
-            document.getElementById('rev-cals').value = result.cals;
-            document.getElementById('rev-p').value = result.macros.p;
-            document.getElementById('rev-c').value = result.macros.c;
-            document.getElementById('rev-f').value = result.macros.f;
-
-         } catch(e) {
-             alert("Erro ao recalcular");
-         } finally {
-             btn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-         }
+        // Deprecated in favor of client-side recalculation in App.js
+        console.warn("Legacy recalculateReview called");
     },
 
     confirmReview: () => {
-        if(!reviewData) return;
-
-        const finalData = {
-            desc: document.getElementById('rev-desc').value,
-            cals: parseInt(document.getElementById('rev-cals').value) || 0,
-            macros: {
-                p: parseInt(document.getElementById('rev-p').value) || 0,
-                c: parseInt(document.getElementById('rev-c').value) || 0,
-                f: parseInt(document.getElementById('rev-f').value) || 0,
-                fib: 0
-            },
-            micros: reviewData.micros || { sodium: 0, sugar: 0, potassium: 0, vitamins: {} },
-            score: 5,
-            category: Input.cat,
-            timestamp: Date.now(),
-            type: 'food'
-        };
-
-        App.addMealToDB(finalData);
-
-        // Reset UI
-        document.getElementById('inp-area-review').classList.add('hidden');
-        document.getElementById('inp-wrapper-normal').classList.remove('hidden');
-        reviewData = null;
-        Modal.close('add-food');
-        alert(`Registrado: ${finalData.desc}`);
+        // Handled by App.js
     },
 
     cancelReview: () => {
-         document.getElementById('inp-area-review').classList.add('hidden');
-         document.getElementById('inp-wrapper-normal').classList.remove('hidden');
-         reviewData = null;
+        // Handled by App.js
     },
 
     analyzeExerciseAI: async () => {
