@@ -170,6 +170,82 @@ export const Analytics = {
             }]
         });
 
+        // Feedback Logic
+        const feedbackEl = document.getElementById('quality-feedback');
+        if (avgPeriodScore !== '--') {
+            const score = parseFloat(avgPeriodScore);
+            let msg = "", icon = "";
+            if (score < 5) {
+                msg = "Sua dieta tem muitos processados. Tente incluir mais alimentos naturais.";
+                icon = "<i class='fas fa-exclamation-circle text-red-500 mt-0.5'></i>";
+            } else if (score < 7.5) {
+                msg = "Você está no caminho certo, mas ainda consome alguns industrializados.";
+                icon = "<i class='fas fa-info-circle text-yellow-500 mt-0.5'></i>";
+            } else {
+                msg = "Excelente! Sua alimentação é majoritariamente natural e nutritiva.";
+                icon = "<i class='fas fa-check-circle text-green-500 mt-0.5'></i>";
+            }
+            feedbackEl.innerHTML = `${icon} <span>${msg}</span>`;
+        } else {
+            feedbackEl.innerHTML = "<span>Sem dados suficientes para análise de qualidade.</span>";
+        }
+
+        // 1.5.1 Average Intake Chart (New Card)
+        // Calculate total intake for the period
+        let totalIntake = 0;
+        let validDays = 0;
+
+        if (daysToRender === 1) {
+            // Sum all non-exercise meals for today
+            const k = DB.getTodayKey();
+            const todaysMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
+            totalIntake = todaysMeals.reduce((acc, m) => acc + m.cals, 0);
+            validDays = 1;
+        } else {
+            // Sum daily averages? Or total average? Instructions say "Average of calories consumed".
+            for (let i = daysToRender - 1; i >= 0; i--) {
+                const d = moment().subtract(i, 'days');
+                const k = d.format('YYYY-MM-DD');
+                const dayMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
+                if (dayMeals.length > 0) {
+                    totalIntake += dayMeals.reduce((acc, m) => acc + m.cals, 0);
+                    validDays++;
+                }
+            }
+        }
+
+        const avgIntake = validDays > 0 ? Math.round(totalIntake / validDays) : 0;
+        const targetCals = p.target || 2000;
+        const intakePct = Math.min(Math.round((avgIntake / targetCals) * 100), 100);
+
+        document.getElementById('avg-intake-val').innerText = `${avgIntake} kcal`;
+        document.getElementById('avg-intake-pct').innerText = `${intakePct}% da meta`;
+
+        const ctxIntake = document.getElementById('chart-intake').getContext('2d');
+        if (Analytics.charts['chart-intake']) Analytics.charts['chart-intake'].destroy();
+
+        Analytics.charts['chart-intake'] = new Chart(ctxIntake, {
+            type: 'doughnut',
+            data: {
+                labels: ['Consumido', 'Restante'],
+                datasets: [{
+                    data: [avgIntake, Math.max(0, targetCals - avgIntake)],
+                    backgroundColor: [
+                        avgIntake > targetCals ? '#ef4444' : '#3b82f6',
+                        '#f3f4f6'
+                    ],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                animation: { animateScale: true, animateRotate: true }
+            }
+        });
+
         // 1.6 Hydration Chart
         Analytics.drawChart('chart-hydration', 'bar', {
             labels: chartLabels,
