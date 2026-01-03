@@ -7,6 +7,8 @@ import { Modal, Input, Voice, UI } from './ui/interface.js';
 import { ChatUI } from './ui/chat.js';
 import { API } from './services/api.js';
 import { Context } from './services/context.js';
+import { Planner } from './ui/planner.js';
+import { Shopping } from './ui/shopping.js';
 
 // =========================================================================
 // 6. MAIN APP CONTROLLER
@@ -31,6 +33,9 @@ export const App = {
 
         // Init Chat UI
         ChatUI.init();
+
+        // Init Planner
+        Planner.init();
 
         // Render Quick Adds (Offline DB)
         const quickContainer = document.getElementById('quick-add-container');
@@ -122,11 +127,12 @@ export const App = {
 
         // Update Nav Icons
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        const index = ['tracker', 'analytics', 'profile'].indexOf(tabId);
-        document.querySelectorAll('.nav-item')[index].classList.add('active');
+        const index = ['tracker', 'analytics', 'planner', 'profile'].indexOf(tabId);
+        if(index >= 0) document.querySelectorAll('.nav-item')[index].classList.add('active');
 
         // Render Analytics only if requested (save performance)
         if (tabId === 'analytics') Analytics.render();
+        if (tabId === 'planner') Planner.render();
         if (tabId === 'profile') Profile.loadToUI();
         // Scroll to top
         document.getElementById('main-scroll').scrollTop = 0;
@@ -712,6 +718,8 @@ window.Voice = Voice;
 window.Gamification = Gamification;
 window.ChatUI = ChatUI;
 window.Context = Context;
+window.Planner = Planner;
+window.Shopping = Shopping;
 
 // Ensure init is called correctly handling module timing
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
