@@ -4,14 +4,25 @@ import { Voice } from './interface.js';
 
 export const ChatUI = {
     isOpen: false,
+    dragState: { isDragging: false, startX: 0, startY: 0, initialLeft: 0, initialTop: 0, hasMoved: false },
 
     init: () => {
         // 1. Create Floating Button
         const btn = document.createElement('button');
         btn.id = "chat-fab";
-        btn.className = "fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-tr from-brand-500 to-emerald-400 rounded-full shadow-lg shadow-brand-500/40 z-50 flex items-center justify-center text-white transition-transform hover:scale-110 active:scale-90 animate-fade-in";
+        btn.className = "fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-tr from-brand-500 to-emerald-400 rounded-full shadow-lg shadow-brand-500/40 z-50 flex items-center justify-center text-white transition-transform hover:scale-110 active:scale-90 animate-fade-in touch-none select-none";
         btn.innerHTML = `<i class="fas fa-comment-medical text-2xl"></i>`;
-        btn.onclick = ChatUI.toggle;
+
+        // Drag Events
+        btn.addEventListener('mousedown', ChatUI.handleDragStart);
+        btn.addEventListener('touchstart', ChatUI.handleDragStart, { passive: false });
+
+        window.addEventListener('mousemove', ChatUI.handleDragMove, { passive: false });
+        window.addEventListener('touchmove', ChatUI.handleDragMove, { passive: false });
+
+        window.addEventListener('mouseup', ChatUI.handleDragEnd);
+        window.addEventListener('touchend', ChatUI.handleDragEnd);
+
         document.body.appendChild(btn);
 
         // 2. Create Chat Modal
@@ -74,6 +85,79 @@ export const ChatUI = {
         ChatUI.updateIndicator();
     },
 
+    handleDragStart: (e) => {
+        const btn = document.getElementById('chat-fab');
+        // Ensure we are dragging the button
+        if (!btn.contains(e.target) && e.target !== btn) return;
+
+        ChatUI.dragState.isDragging = true;
+        ChatUI.dragState.hasMoved = false;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        ChatUI.dragState.startX = clientX;
+        ChatUI.dragState.startY = clientY;
+
+        const rect = btn.getBoundingClientRect();
+        ChatUI.dragState.initialLeft = rect.left;
+        ChatUI.dragState.initialTop = rect.top;
+
+        // Disable transition for instant follow
+        btn.style.transition = 'none';
+
+        // Prevent default only if needed (e.g. to stop scrolling on touch)
+        // e.preventDefault();
+    },
+
+    handleDragMove: (e) => {
+        if (!ChatUI.dragState.isDragging) return;
+
+        // Prevent scrolling while dragging
+        if (e.cancelable) e.preventDefault();
+
+        const btn = document.getElementById('chat-fab');
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        const dx = clientX - ChatUI.dragState.startX;
+        const dy = clientY - ChatUI.dragState.startY;
+
+        // Threshold to distinguish click from drag
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            ChatUI.dragState.hasMoved = true;
+        }
+
+        let newLeft = ChatUI.dragState.initialLeft + dx;
+        let newTop = ChatUI.dragState.initialTop + dy;
+
+        // Constraints
+        const maxLeft = window.innerWidth - btn.offsetWidth;
+        const maxTop = window.innerHeight - btn.offsetHeight;
+
+        newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+        newTop = Math.max(0, Math.min(newTop, maxTop));
+
+        btn.style.left = `${newLeft}px`;
+        btn.style.top = `${newTop}px`;
+        btn.style.bottom = 'auto';
+        btn.style.right = 'auto';
+    },
+
+    handleDragEnd: (e) => {
+        if (!ChatUI.dragState.isDragging) return;
+
+        const btn = document.getElementById('chat-fab');
+        ChatUI.dragState.isDragging = false;
+
+        // Restore transition
+        btn.style.transition = '';
+
+        if (!ChatUI.dragState.hasMoved) {
+            ChatUI.toggle();
+        }
+    },
+
     toggle: () => {
         const modal = document.getElementById('chat-modal');
         ChatUI.isOpen = !ChatUI.isOpen;
@@ -81,7 +165,8 @@ export const ChatUI = {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             ChatUI.updateIndicator();
-            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+            const msgContainer = document.getElementById('chat-messages');
+            if(msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
         } else {
             modal.classList.add('hidden');
             modal.classList.remove('flex');

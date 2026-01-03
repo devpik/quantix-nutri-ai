@@ -50,7 +50,18 @@ export const DB = {
     },
 
     getMeals: () => DB.get('meals', []),
-    // Structure: { id, timestamp, dateKey, desc, cals, macros: {p,c,f,fib}, category, type: 'food'|'exercise', score }
+    // Structure: { id, timestamp, dateKey, desc, cals, macros: {p,c,f,fib}, category, type: 'food'|'exercise', score, symptoms: [] }
+
+    updateMeal: (updatedMeal) => {
+        const meals = DB.get('meals', []);
+        const idx = meals.findIndex(m => m.id === updatedMeal.id);
+        if (idx !== -1) {
+            meals[idx] = updatedMeal;
+            DB.set('meals', meals);
+            return true;
+        }
+        return false;
+    },
 
     getDayStats: () => {
         const today = DB.getTodayKey();
