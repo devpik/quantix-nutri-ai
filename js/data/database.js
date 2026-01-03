@@ -69,5 +69,9 @@ export const DB = {
 
     getStreak: () => DB.get('streak', { current: 0, lastLogin: null, max: 0 }),
 
-    getCombos: () => DB.get('combos', [])
+    getCombos: () => DB.get('combos', []),
+
+    getPlanner: () => DB.get('planner', null), // Returns null if not generated
+
+    getShoppingList: () => DB.get('shopping_list', null)
 };

@@ -436,6 +436,13 @@
             </div>
 
             <!-- === TAB 3: PROFILE === -->
+            <!-- === TAB 4: PLANNER === -->
+            <div id="tab-planner" class="tab-content hidden space-y-6">
+                <div id="planner-container" class="animate-fade-in">
+                     <!-- Injected via Planner.render() -->
+                </div>
+            </div>
+
             <div id="tab-profile" class="tab-content hidden space-y-6">
                 <!-- Profile Header -->
                 <div class="text-center pt-2">
@@ -645,12 +652,17 @@
                 <span class="text-[9px] font-bold uppercase tracking-wide">Diário</span>
                 <div class="nav-indicator"></div>
             </button>
-            <button onclick="App.switchTab('analytics')" class="nav-item flex flex-col items-center w-1/3 btn-press group">
+            <button onclick="App.switchTab('analytics')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
                 <i class="fas fa-chart-pie text-xl mb-1 group-hover:scale-110 transition"></i>
                 <span class="text-[9px] font-bold uppercase tracking-wide">Análise</span>
                 <div class="nav-indicator"></div>
             </button>
-            <button onclick="App.switchTab('profile')" class="nav-item flex flex-col items-center w-1/3 btn-press group">
+            <button onclick="App.switchTab('planner')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
+                <i class="fas fa-calendar-check text-xl mb-1 group-hover:scale-110 transition"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wide">Plano</span>
+                <div class="nav-indicator"></div>
+            </button>
+            <button onclick="App.switchTab('profile')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
                 <i class="fas fa-user-astronaut text-xl mb-1 group-hover:scale-110 transition"></i>
                 <span class="text-[9px] font-bold uppercase tracking-wide">Perfil</span>
                 <div class="nav-indicator"></div>
@@ -682,6 +694,22 @@
                         Salvar e Iniciar
                     </button>
                     <p class="text-[9px] text-center text-gray-400 mt-4">Sua chave fica salva apenas no seu dispositivo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SHOPPING LIST -->
+        <div id="modal-shopping-list" class="modal-overlay z-[60]">
+            <div class="modal-content pb-6">
+                <div class="flex justify-center pt-2 pb-4">
+                    <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="px-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Lista de Compras</h3>
+                        <button onclick="Modal.close('shopping-list')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
+                    </div>
+                    <div id="shopping-list-container"></div>
                 </div>
             </div>
         </div>

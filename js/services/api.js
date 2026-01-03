@@ -338,5 +338,148 @@ export const API = {
             btn.disabled = false;
             load.classList.add('hidden');
         }
+    },
+
+    generateWeeklyPlan: async () => {
+        const p = DB.getProfile();
+        if (p.credits <= 0) return alert("Sem créditos IA! Recarregue ou suba de nível.");
+
+        try {
+            const prompt = `
+                Atue como um Nutricionista e Chef Prático.
+                Gere um PLANEJAMENTO SEMANAL (7 dias, Segunda a Domingo) para o usuário.
+
+                Perfil do Usuário:
+                - Meta Calórica: ${p.target} kcal/dia
+                - Estratégia: ${p.strategy}
+                - Restrições/Preferências: ${p.restrictions || 'Nenhuma'}
+
+                Diretrizes:
+                1. FOCO EM PRATICIDADE: Repita pratos (ex: jantar de seg = almoço de ter) para facilitar o cozimento.
+                2. Use ingredientes acessíveis e comuns no Brasil.
+                3. Retorne APENAS um JSON estrito (sem markdown) com a seguinte estrutura:
+                {
+                    "week": [
+                        {
+                            "day": "Segunda-feira",
+                            "meals": {
+                                "breakfast": { "desc": "...", "estimated_cals": 0 },
+                                "lunch": { "desc": "...", "estimated_cals": 0 },
+                                "snack": { "desc": "...", "estimated_cals": 0 },
+                                "dinner": { "desc": "...", "estimated_cals": 0 }
+                            }
+                        },
+                        ... (até Domingo)
+                    ]
+                }
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+            if (!json.candidates || !json.candidates[0]) throw new Error("Erro na geração.");
+
+            let txt = json.candidates[0].content.parts[0].text;
+            txt = txt.replace(/```json/g, '').replace(/```/g, ''); // Clean markdown
+
+            const result = JSON.parse(txt);
+
+            // Persist
+            DB.set('planner', result.week);
+
+            // Refresh profile to avoid race condition
+            const currentP = DB.getProfile();
+            currentP.credits -= 5; // Higher cost for full plan
+            DB.set('profile', currentP);
+
+            return result.week;
+
+        } catch (e) {
+            console.error(e);
+            throw new Error("Não foi possível gerar o plano. Tente novamente.");
+        }
+    },
+
+    generateShoppingList: async (plannerData) => {
+        const p = DB.getProfile();
+        // Consome menos créditos ou nenhum se já tiver o plano? Vamos cobrar 1 crédito.
+
+        try {
+            // Flatten planner meals into a text list
+            let allMeals = [];
+            plannerData.forEach(d => {
+                Object.values(d.meals).forEach(m => allMeals.push(m.desc));
+            });
+
+            const prompt = `
+                Analise esta lista de refeições de uma semana:
+                "${allMeals.join('; ')}"
+
+                Objetivo: Criar uma LISTA DE COMPRAS consolidada e inteligente.
+
+                Ações:
+                1. Extraia os ingredientes base necessários.
+                2. Estime a quantidade TOTAL aproximada para a semana (ex: se aparece frango 3x, some).
+                3. Agrupe por categorias de mercado (Açougue, Hortifruti, Mercearia, Laticínios, Outros).
+
+                Retorne APENAS um JSON estrito com esta estrutura:
+                {
+                    "shopping_list": [
+                        {
+                            "category": "Açougue",
+                            "items": [
+                                { "name": "Peito de Frango", "quantity": "1kg" },
+                                ...
+                            ]
+                        },
+                        ...
+                    ]
+                }
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+            if (!json.candidates || !json.candidates[0]) throw new Error("Erro na geração da lista.");
+
+            let txt = json.candidates[0].content.parts[0].text;
+            txt = txt.replace(/```json/g, '').replace(/```/g, '');
+
+            const result = JSON.parse(txt);
+
+            // Add checked state to items
+            result.shopping_list.forEach(cat => {
+                cat.items.forEach(item => item.checked = false);
+            });
+
+            DB.set('shopping_list', result.shopping_list);
+
+            // Refresh profile to avoid race condition
+            const currentP = DB.getProfile();
+            currentP.credits--;
+            DB.set('profile', currentP);
+
+            return result.shopping_list;
+
+        } catch (e) {
+            console.error(e);
+            throw new Error("Erro ao gerar lista de compras.");
+        }
     }
 };
