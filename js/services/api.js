@@ -408,6 +408,42 @@ export const API = {
         }
     },
 
+    simplifyMeal: async (mealDescription, targetCals) => {
+        const p = DB.getProfile();
+        if (p.credits <= 0) throw new Error("Sem créditos IA!");
+
+        const prompt = `
+            Você é um nutricionista prático. O usuário quer substituir a refeição: "${mealDescription}" (~${targetCals} kcal).
+            Sugira uma alternativa ULTRA SIMPLES (ex: "Ovos mexidos e fruta", "Sanduíche rápido") que exija o mínimo de preparo (max 5 min) e mantenha as calorias próximas.
+            Retorne apenas JSON: { "desc": "Novo Prato Rápido", "estimated_cals": 0 }
+        `;
+
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }]
+        };
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${CONFIG.apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const json = await res.json();
+        if (!json.candidates || !json.candidates[0]) throw new Error("Erro na simplificação.");
+
+        let txt = json.candidates[0].content.parts[0].text;
+        txt = txt.replace(/```json/g, '').replace(/```/g, '');
+
+        const result = JSON.parse(txt);
+
+        Profile.updateApiUsage(json.usageMetadata);
+        p.credits--;
+        DB.set('profile', p);
+        Gamification.updateUI();
+
+        return result;
+    },
+
     generateShoppingList: async (plannerData) => {
         const p = DB.getProfile();
         // Consome menos créditos ou nenhum se já tiver o plano? Vamos cobrar 1 crédito.

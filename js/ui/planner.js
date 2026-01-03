@@ -56,10 +56,10 @@ export const Planner = {
                     </div>
 
                     <div id="content-day-${index}" class="hidden p-4 space-y-4 border-t border-gray-100 dark:border-gray-700">
-                        ${Planner.renderMealRow(day.meals.breakfast, 'Café da Manhã', 'coffee')}
-                        ${Planner.renderMealRow(day.meals.lunch, 'Almoço', 'utensils')}
-                        ${Planner.renderMealRow(day.meals.snack, 'Lanche', 'apple-alt')}
-                        ${Planner.renderMealRow(day.meals.dinner, 'Jantar', 'moon')}
+                        ${Planner.renderMealRow(day.meals.breakfast, 'Café da Manhã', 'coffee', index, 'breakfast')}
+                        ${Planner.renderMealRow(day.meals.lunch, 'Almoço', 'utensils', index, 'lunch')}
+                        ${Planner.renderMealRow(day.meals.snack, 'Lanche', 'apple-alt', index, 'snack')}
+                        ${Planner.renderMealRow(day.meals.dinner, 'Jantar', 'moon', index, 'dinner')}
                     </div>
                 </div>
             `;
@@ -69,7 +69,7 @@ export const Planner = {
         container.innerHTML = html;
     },
 
-    renderMealRow: (meal, label, icon) => {
+    renderMealRow: (meal, label, icon, dayIndex, mealKey) => {
         if (!meal) return '';
         // Escape quotes for safety (single and double)
         const descSafe = meal.desc.replace(/"/g, '&quot;').replace(/'/g, "\\'");
@@ -80,17 +80,46 @@ export const Planner = {
                     <i class="fas fa-${icon}"></i> ${label}
                 </div>
                 <div class="pl-2 border-l-2 border-gray-100 dark:border-gray-700">
-                    <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">${meal.desc}</p>
+                    <p id="desc-${dayIndex}-${mealKey}" class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">${meal.desc}</p>
                     <div class="flex justify-between items-center mt-2">
                         <span class="text-[10px] font-bold text-gray-400">~${meal.estimated_cals} kcal</span>
-                        <button onclick="Planner.logMeal('${descSafe}', ${meal.estimated_cals}, '${label}')"
-                            class="text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded hover:bg-brand-500 hover:text-white transition">
-                            Comi isso
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="Planner.simplify('${descSafe}', ${meal.estimated_cals}, ${dayIndex}, '${mealKey}')"
+                                title="Simplificar (Dia Corrido)"
+                                class="text-[10px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded hover:bg-yellow-200 transition">
+                                <i class="fas fa-bolt"></i>
+                            </button>
+                            <button onclick="Planner.logMeal('${descSafe}', ${meal.estimated_cals}, '${label}')"
+                                class="text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded hover:bg-brand-500 hover:text-white transition">
+                                Comi isso
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+    },
+
+    simplify: async (desc, cals, dayIndex, mealKey) => {
+        const descEl = document.getElementById(`desc-${dayIndex}-${mealKey}`);
+        if(descEl) {
+             descEl.innerHTML = '<span class="animate-pulse"><i class="fas fa-spinner fa-spin mr-1"></i> Simplificando...</span>';
+        }
+
+        try {
+            const newMeal = await API.simplifyMeal(desc, cals);
+
+            const plan = DB.getPlanner();
+            if (plan && plan[dayIndex] && plan[dayIndex].meals[mealKey]) {
+                plan[dayIndex].meals[mealKey] = newMeal;
+                DB.set('planner', plan);
+                Planner.render();
+            }
+        } catch (e) {
+            console.error(e);
+            alert(e.message || "Erro ao simplificar.");
+            Planner.render(); // Restore
+        }
     },
 
     toggleDay: (index) => {
