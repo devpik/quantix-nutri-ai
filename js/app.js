@@ -227,6 +227,12 @@ export const App = {
                     if (m.micros.sugar > 15) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-orange-500" title="Alto Açúcar"></span>`;
                 }
 
+                // Symptom Tags
+                let symptomTags = "";
+                if (!isEx) {
+                    symptomTags = UI.getSymptomTags(m.symptoms);
+                }
+
                 // Dynamic Icon Color based on Score
                 let iconClass = "bg-brand-50 text-brand-500";
                 if (!isEx && m.score) {
@@ -257,26 +263,55 @@ export const App = {
                                 ${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
                                 ${badges}
                             </h4>
-                            <p class="text-[9px] text-gray-400 font-bold flex items-center">
+                            <p class="text-[9px] text-gray-400 font-bold flex items-center gap-2 flex-wrap mt-0.5">
                                 ${m.category || 'Atividade'} • ${time}
                                 ${scoreBadge}
                             </p>
+                            ${symptomTags ? `<div class="mt-1 flex flex-wrap gap-1">${symptomTags}</div>` : ''}
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="block text-xs font-black ${isEx ? 'text-blue-500' : 'text-gray-800 dark:text-white'}">${isEx ? '-' : '+'}${m.cals}</span>
-                        ${!isEx ? `<span class="text-[8px] text-gray-400">P:${m.macros.p} C:${m.macros.c} G:${m.macros.f}</span>` : ''}
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="text-right">
+                            <span class="block text-xs font-black ${isEx ? 'text-blue-500' : 'text-gray-800 dark:text-white'}">${isEx ? '-' : '+'}${m.cals}</span>
+                            ${!isEx ? `<span class="text-[8px] text-gray-400">P:${m.macros.p} C:${m.macros.c} G:${m.macros.f}</span>` : ''}
+                        </div>
+                        <div id="action-container-${m.id}"></div>
                     </div>
                 `;
-                // Long press to delete logic could be added here
-                // Simple delete button for MVP:
+
+                // Inject Symptom Button via DOM
+                if (!isEx) {
+                    // We need to do this after appending `el` or by creating the button and appending it to a placeholder.
+                    // Since `el.innerHTML` is set, we can find the placeholder or append to the container.
+                    // Easier: create the container in HTML string (id unique) then append button.
+                }
+
+                // Wrapper for delete button to align better
+                const rightCol = document.createElement('div');
+                rightCol.className = "flex items-center ml-2";
+
                 const delBtn = document.createElement('button');
-                delBtn.className = "ml-2 text-gray-300 hover:text-red-500 p-2";
+                delBtn.className = "text-gray-300 hover:text-red-500 p-2";
                 delBtn.innerHTML = "<i class='fas fa-times'></i>";
                 delBtn.onclick = () => { if(confirm('Apagar item?')) App.deleteMeal(m.id); };
-                el.appendChild(delBtn);
+                rightCol.appendChild(delBtn);
+
+                el.appendChild(rightCol);
 
                 feed.appendChild(el);
+
+                // Now that `el` is in DOM (or we can access it before), we can attach the symptom button.
+                // Wait, `el` is created but appended at end. We can modify `el` before appending.
+                if (!isEx) {
+                    const actionContainer = el.querySelector(`[id="action-container-${m.id}"]`);
+                    if (actionContainer) {
+                        const symBtn = document.createElement('button');
+                        symBtn.className = "text-[10px] text-gray-400 hover:text-brand-500 font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-transparent hover:border-brand-200 hover:bg-brand-50 transition";
+                        symBtn.innerHTML = `<i class="far fa-smile"></i> ${m.symptoms && m.symptoms.length > 0 ? 'Editar' : 'Sentiu?'}`;
+                        symBtn.onclick = () => App.openSymptoms(m.id);
+                        actionContainer.appendChild(symBtn);
+                    }
+                }
             });
         }
 
@@ -715,6 +750,40 @@ export const App = {
         DB.set('meals', meals);
         Gamification.addXP(20);
         App.refreshUI();
+    },
+
+    // --- SYMPTOMS LOGIC ---
+    openSymptoms: (id) => {
+        // id is string in HTML attribute, ensure type matching
+        const meals = DB.getMeals();
+        // Try to find by string comparison or number
+        const m = meals.find(x => x.id == id);
+        if(!m) return;
+        UI.openSymptomModal(m.id, m.symptoms || []);
+    },
+
+    saveSymptoms: () => {
+        const id = UI.currentMealId;
+        const selected = [];
+        document.querySelectorAll('.active-symptom').forEach(btn => {
+            selected.push(btn.getAttribute('data-id'));
+        });
+
+        const meals = DB.getMeals();
+        const m = meals.find(x => x.id === id);
+
+        if (m) {
+            m.symptoms = selected;
+            // Update DB
+            if(DB.updateMeal(m)) {
+                Modal.close('symptoms');
+                App.refreshUI();
+                // Feedback
+                setTimeout(() => {
+                    alert("Sintomas registrados!");
+                }, 100);
+            }
+        }
     },
 
     // --- DATA IO ---
