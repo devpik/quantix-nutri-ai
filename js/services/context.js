@@ -52,6 +52,12 @@ export const Context = {
         }
 
         // Summary Object
+        const nowHour = moment().hour();
+        const startHour = 7;
+        const endHour = 22;
+        const totalHours = endHour - startHour; // 15
+        const currentProgress = Math.max(0, Math.min(1, (nowHour - startHour) / totalHours));
+
         return {
             range: range,
             period: range === 1 ? "Hoje" : `Últimos ${range} dias`,
@@ -71,6 +77,12 @@ export const Context = {
                 cals: profile.target * range, // Total budget for the period
                 water: 2500 * range // Assuming 2.5L target
             },
+            timeContext: {
+                currentHour: nowHour,
+                formatted: moment().format("HH:mm"),
+                dayProgress: (currentProgress * 100).toFixed(0) + "%",
+                goalProgress: Math.round((totalCals / (profile.target * range)) * 100) + "%"
+            },
             meals: filteredMeals // Raw list for detailed analysis if needed
         };
     },
@@ -85,6 +97,7 @@ export const Context = {
         Seu objetivo é analisar os dados do usuário e dar conselhos personalizados.
 
         CONTEXTO DE ANÁLISE: ${data.period}
+        HORA ATUAL: ${data.timeContext ? data.timeContext.formatted : 'N/A'}
 
         PERFIL DO USUÁRIO:
         - Nome: ${profile.name}
@@ -105,10 +118,11 @@ export const Context = {
 
         DIRETRIZES DE RESPOSTA:
         1. Se o período for "Hoje", seja TÁTICO. Diga o que falta para bater a meta hoje ou corrija exageros.
-        2. Se o período for longo (7/15/30 dias), seja ESTRATÉGICO. Analise tendências, consistência e dê conselhos de longo prazo.
-        3. CITE OS DADOS. Não dê dicas genéricas. Diga "Vi que você comeu X" ou "Sua média de água está baixa".
-        4. Seja motivador mas firme quanto à qualidade (Score).
-        5. Responda de forma concisa e amigável.
+        2. Analise a ingestão calórica RELATIVA ao horário atual. Se for cedo (ex: manhã/início da tarde) e o usuário tiver comido pouco, ISSO É NORMAL. Não alerte sobre baixa ingestão a menos que seja noite e a meta esteja muito longe.
+        3. Se o período for longo (7/15/30 dias), seja ESTRATÉGICO. Analise tendências, consistência e dê conselhos de longo prazo.
+        4. CITE OS DADOS. Não dê dicas genéricas. Diga "Vi que você comeu X" ou "Sua média de água está baixa".
+        5. Seja motivador mas firme quanto à qualidade (Score).
+        6. Responda de forma concisa e amigável.
         `;
 
         return prompt;

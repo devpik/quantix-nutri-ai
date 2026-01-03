@@ -1,5 +1,6 @@
 import { API } from '../services/api.js';
 import { Analytics } from './analytics.js';
+import { Voice } from './interface.js';
 
 export const ChatUI = {
     isOpen: false,
@@ -54,9 +55,13 @@ export const ChatUI = {
                 <!-- Input Area -->
                 <div class="p-3 bg-white dark:bg-dark-card border-t border-gray-100 dark:border-dark-border shrink-0">
                     <div class="relative flex items-end gap-2">
-                        <textarea id="chat-input" rows="1" placeholder="Pergunte algo..." class="w-full bg-gray-100 dark:bg-gray-800 rounded-2xl py-3 pl-4 pr-10 text-sm outline-none resize-none max-h-32 focus:ring-1 focus:ring-brand-500 text-gray-800 dark:text-white" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                        <textarea id="chat-input" rows="1" placeholder="Pergunte algo..." class="flex-1 bg-gray-100 dark:bg-gray-800 rounded-2xl py-3 pl-4 pr-10 text-sm outline-none resize-none max-h-32 focus:ring-1 focus:ring-brand-500 text-gray-800 dark:text-white" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
 
-                        <button onclick="ChatUI.sendMessage()" class="bg-brand-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-brand-600 transition disabled:opacity-50 disabled:cursor-not-allowed" id="btn-chat-send">
+                        <button onclick="Voice.start('chat-input')" id="btn-mic-chat-input" class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition shrink-0">
+                            <i class="fas fa-microphone text-xs"></i>
+                        </button>
+
+                        <button onclick="ChatUI.sendMessage()" class="bg-brand-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-brand-600 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0" id="btn-chat-send">
                             <i class="fas fa-paper-plane text-xs"></i>
                         </button>
                     </div>
