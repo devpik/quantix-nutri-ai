@@ -62,6 +62,13 @@ export const Voice = {
 
 export const Modal = {
     open: (id) => {
+        if (id === 'add-food') {
+            const h = new Date().getHours();
+            if (h >= 5 && h <= 10) Input.setCat('Café da Manhã');
+            else if (h >= 11 && h <= 14) Input.setCat('Almoço');
+            else if (h >= 15 && h <= 17) Input.setCat('Lanche');
+            else Input.setCat('Jantar');
+        }
         document.getElementById('modal-' + id).classList.add('active');
     },
     close: (id) => {
