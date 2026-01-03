@@ -9,6 +9,7 @@ import { API } from './services/api.js';
 import { Context } from './services/context.js';
 import { Planner } from './ui/planner.js';
 import { Shopping } from './ui/shopping.js';
+import { Fasting } from './ui/fasting.js';
 
 // =========================================================================
 // 6. MAIN APP CONTROLLER
@@ -619,10 +620,22 @@ export const App = {
         App.refreshUI();
     },
 
+    removeWater: (ml) => {
+        const stats = DB.getDayStats(); const today = DB.getTodayKey();
+        stats[today].water = Math.max(0, stats[today].water - ml);
+        DB.set('day_stats', stats);
+        App.refreshUI();
+    },
+
     toggleFasting: () => {
         const stats = DB.getDayStats(); const today = DB.getTodayKey();
         if (stats[today].fastingStart) {
-            if(confirm("Encerrar jejum agora?")) stats[today].fastingStart = null;
+            if(confirm("Encerrar jejum agora?")) {
+                // Calculate duration and add to today's minutes
+                const durationMinutes = (Date.now() - stats[today].fastingStart) / 1000 / 60;
+                stats[today].fastingMinutes = (stats[today].fastingMinutes || 0) + durationMinutes;
+                stats[today].fastingStart = null;
+            }
         } else {
             stats[today].fastingStart = Date.now();
         }
@@ -720,6 +733,7 @@ window.ChatUI = ChatUI;
 window.Context = Context;
 window.Planner = Planner;
 window.Shopping = Shopping;
+window.Fasting = Fasting;
 
 // Ensure init is called correctly handling module timing
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

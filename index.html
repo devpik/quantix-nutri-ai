@@ -282,36 +282,49 @@
                 <!-- Action Grid -->
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Water Card -->
-                    <div class="glass-panel p-4 rounded-3xl relative overflow-hidden group active:scale-95 transition-transform duration-200 cursor-pointer" onclick="App.addWater(250)">
-                        <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition"></div>
-                        <div class="absolute bottom-0 right-0 w-16 h-16 bg-blue-400/20 rounded-tl-3xl -mr-4 -mb-4"></div>
+                    <div class="glass-panel p-4 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition pointer-events-none"></div>
+                        <div class="absolute bottom-0 right-0 w-16 h-16 bg-blue-400/20 rounded-tl-3xl -mr-4 -mb-4 pointer-events-none"></div>
                         
                         <div class="relative z-10">
                             <div class="flex justify-between items-start">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500">
-                                    <i class="fas fa-tint text-xs"></i>
+                                <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 cursor-pointer" onclick="App.addWater(250)">
+                                    <i class="fas fa-plus text-xs"></i>
                                 </div>
                                 <span id="water-val" class="text-lg font-bold text-gray-800 dark:text-white">0ml</span>
                             </div>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-2">Hidratação</p>
-                            <div class="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
-                                <div id="water-bar-mini" class="h-full bg-blue-500 w-0"></div>
+
+                            <div class="flex justify-between items-end mt-2">
+                                <div>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Hidratação</p>
+                                    <div class="w-20 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-1 overflow-hidden">
+                                        <div id="water-bar-mini" class="h-full bg-blue-500 w-0"></div>
+                                    </div>
+                                </div>
+                                <button id="btn-minus-water" onclick="App.removeWater(250)" class="w-6 h-6 rounded-full bg-red-50 dark:bg-red-900/20 text-red-400 hover:text-red-500 flex items-center justify-center transition">
+                                    <i class="fas fa-minus text-[10px]"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Fasting Card -->
-                    <div class="glass-panel p-4 rounded-3xl relative overflow-hidden active:scale-95 transition-transform duration-200 cursor-pointer" onclick="App.toggleFasting()">
-                        <div class="absolute inset-0 bg-orange-500/5 hover:bg-orange-500/10 transition"></div>
+                    <div class="glass-panel p-4 rounded-3xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-orange-500/5 hover:bg-orange-500/10 transition pointer-events-none"></div>
                         
                         <div class="relative z-10">
                             <div class="flex justify-between items-start">
-                                <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-500">
+                                <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-500 cursor-pointer" onclick="App.toggleFasting()">
                                     <i class="fas fa-stopwatch text-xs"></i>
                                 </div>
-                                <span id="fasting-state-text" class="text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500">OFF</span>
+                                <div class="flex items-center gap-1">
+                                    <span id="fasting-state-text" class="text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500">OFF</span>
+                                    <button id="btn-edit-fasting" onclick="Fasting.openEdit()" class="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-brand-500 flex items-center justify-center transition">
+                                        <i class="fas fa-pen text-[9px]"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="mt-1">
+                            <div class="mt-1 cursor-pointer" onclick="App.toggleFasting()">
                                 <span id="fasting-timer" class="text-lg font-mono font-bold text-gray-800 dark:text-white tracking-tight">--:--</span>
                             </div>
                             <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">Jejum Intermitente</p>
@@ -710,6 +723,37 @@
                         <button onclick="Modal.close('shopping-list')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                     </div>
                     <div id="shopping-list-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: FASTING EDIT -->
+        <div id="modal-fasting-edit" class="modal-overlay z-[60]">
+            <div class="modal-content pb-6">
+                <div class="flex justify-center pt-2 pb-4">
+                    <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                </div>
+                <div class="px-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Ajustar Jejum</h3>
+                        <button onclick="Modal.close('fasting-edit')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Início</label>
+                            <input type="datetime-local" id="inp-fasting-start" class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Fim (Opcional)</label>
+                            <input type="datetime-local" id="inp-fasting-end" class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 outline-none">
+                            <p class="text-[9px] text-gray-400 mt-1">Deixe em branco se o jejum ainda estiver ativo.</p>
+                        </div>
+
+                        <button onclick="Fasting.save()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press">
+                            Salvar Ajuste
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
