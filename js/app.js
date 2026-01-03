@@ -227,11 +227,29 @@ export const App = {
                     if (m.micros.sugar > 15) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-orange-500" title="Alto Açúcar"></span>`;
                 }
 
+                // Dynamic Icon Color based on Score
+                let iconClass = "bg-brand-50 text-brand-500";
+                if (!isEx && m.score) {
+                    if (m.score >= 8) iconClass = "bg-green-100 text-green-500";
+                    else if (m.score >= 5) iconClass = "bg-yellow-100 text-yellow-600";
+                    else iconClass = "bg-red-100 text-red-500";
+                }
+                if (isEx) iconClass = "bg-blue-100 text-blue-500";
+
+                // Score Badge
+                let scoreBadge = "";
+                if (!isEx && m.score) {
+                    let scoreColor = m.score >= 8 ? "text-green-600 bg-green-50 border-green-100" :
+                                     m.score >= 5 ? "text-yellow-600 bg-yellow-50 border-yellow-100" :
+                                     "text-red-500 bg-red-50 border-red-100";
+                    scoreBadge = `<span class="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded border ${scoreColor} dark:bg-opacity-10 dark:border-opacity-10">Score: ${m.score}</span>`;
+                }
+
                 const el = document.createElement('div');
                 el.className = "flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up";
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full ${isEx ? 'bg-blue-100 text-blue-500' : 'bg-brand-50 text-brand-500'} dark:bg-opacity-20 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full ${iconClass} dark:bg-opacity-20 flex items-center justify-center">
                             <i class="fas ${isEx ? 'fa-running' : (m.category === 'Café da Manhã' ? 'fa-mug-hot' : 'fa-utensils')}"></i>
                         </div>
                         <div>
@@ -239,7 +257,10 @@ export const App = {
                                 ${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
                                 ${badges}
                             </h4>
-                            <p class="text-[9px] text-gray-400 font-bold">${m.category || 'Atividade'} • ${time}</p>
+                            <p class="text-[9px] text-gray-400 font-bold flex items-center">
+                                ${m.category || 'Atividade'} • ${time}
+                                ${scoreBadge}
+                            </p>
                         </div>
                     </div>
                     <div class="text-right">

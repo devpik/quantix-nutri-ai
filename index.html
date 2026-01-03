@@ -384,6 +384,20 @@
                     </div>
                 </div>
 
+                <!-- Average Intake Chart -->
+                <div class="glass-panel p-4 rounded-3xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase">Média Calórica</h3>
+                        <span id="avg-intake-val" class="text-lg font-black text-gray-800 dark:text-white">--</span>
+                    </div>
+                    <div class="h-40 w-full relative">
+                        <canvas id="chart-intake"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span id="avg-intake-pct" class="text-sm font-bold text-gray-400">--%</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Weight Projection -->
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden">
                     <i class="fas fa-chart-line absolute -bottom-4 -right-4 text-[100px] opacity-10"></i>
@@ -414,6 +428,9 @@
                     </div>
                     <div class="h-40 w-full">
                         <canvas id="chart-quality"></canvas>
+                    </div>
+                    <div id="quality-feedback" class="mt-4 p-3 bg-gray-50 dark:bg-dark-bg/50 rounded-xl border border-gray-100 dark:border-dark-border text-xs text-gray-600 dark:text-gray-400 leading-relaxed flex items-start gap-2">
+                        <!-- Feedback injected via JS -->
                     </div>
                 </div>
 
