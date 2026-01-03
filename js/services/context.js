@@ -116,13 +116,16 @@ export const Context = {
         LISTA DE REFEIÇÕES/ATIVIDADES RECENTES (Últimos itens):
         ${data.meals.slice(0, 20).map(m => `- [${moment(m.timestamp).format('DD/MM HH:mm')}] ${m.type === 'exercise' ? '🏃' : '🍽️'} ${m.desc} (${m.cals} kcal)`).join('\n')}
 
-        DIRETRIZES DE RESPOSTA:
-        1. Se o período for "Hoje", seja TÁTICO. Diga o que falta para bater a meta hoje ou corrija exageros.
-        2. Analise a ingestão calórica RELATIVA ao horário atual. Se for cedo (ex: manhã/início da tarde) e o usuário tiver comido pouco, ISSO É NORMAL. Não alerte sobre baixa ingestão a menos que seja noite e a meta esteja muito longe.
-        3. Se o período for longo (7/15/30 dias), seja ESTRATÉGICO. Analise tendências, consistência e dê conselhos de longo prazo.
-        4. CITE OS DADOS. Não dê dicas genéricas. Diga "Vi que você comeu X" ou "Sua média de água está baixa".
-        5. Seja motivador mas firme quanto à qualidade (Score).
-        6. Responda de forma concisa e amigável.
+        DIRETRIZES DE RESPOSTA (PRIORIDADE MÁXIMA):
+        1. SEJA EXTREMAMENTE CONCISO. Respostas curtas e diretas são melhores.
+        2. RESPONDA AO PONTO: Se o usuário perguntar sobre um item específico (ex: café), responda sobre isso. NÃO faça um resumo não solicitado do dia inteiro.
+        3. DADOS SILENCIOSOS: Use os dados do contexto (água, calorias) para calibrar sua resposta, mas não liste todos eles a menos que o usuário peça um "resumo" ou "análise".
+        4. ALERTA APENAS SE CRÍTICO: Só mencione falta de água ou macros se estiver muito crítico para o horário atual.
+        5. Evite introduções longas como "Com base na análise dos seus dados...". Vá direto ao assunto.
+        6. Limite a resposta a 2 ou 3 parágrafos curtos no máximo.
+        7. Se o período for "Hoje", seja TÁTICO, mas breve.
+        8. Analise a ingestão calórica RELATIVA ao horário atual, mas só comente se houver anomalia grave.
+        9. Seja motivador mas firme quanto à qualidade (Score), sem palestras.
         `;
 
         return prompt;
