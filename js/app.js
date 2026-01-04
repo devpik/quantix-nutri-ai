@@ -425,6 +425,11 @@ export const App = {
              parentName = document.getElementById('inp-combo-name').value.trim();
         }
 
+        // Calculate XP Batch
+        const actionType = chkCombo.checked ? 'combo_entry' : 'meal_entry';
+        const xpRes = Gamification.calculateTransactionXP(actionType, { itemCount: App.reviewItems.length });
+        Gamification.addXP(xpRes.xp);
+
         App.reviewItems.forEach(item => {
              const data = {
                  desc: item.desc,
@@ -439,7 +444,7 @@ export const App = {
                  parent_name: parentName,
                  type: 'food'
              };
-             App.addMealToDB(data);
+             App.addMealToDB(data, true);
              totalCals += data.cals;
         });
 
@@ -451,11 +456,11 @@ export const App = {
 
         // Custom Feedback
         const msg = App.reviewItems.length > 1
-            ? `Registrados ${App.reviewItems.length} itens (${Math.round(totalCals)} kcal)`
-            : `Registrado com sucesso!`;
+            ? `Registrados ${App.reviewItems.length} itens (${Math.round(totalCals)} kcal)\n${xpRes.message} (+${xpRes.xp} XP)`
+            : `Registrado com sucesso!\n${xpRes.message} (+${xpRes.xp} XP)`;
 
         // Use a small timeout to ensure alert doesn't block UI refresh if any
-        setTimeout(() => alert("Refeição registrada com sucesso!"), 100);
+        setTimeout(() => alert(msg), 100);
     },
 
     cancelReview: () => {
@@ -517,6 +522,10 @@ export const App = {
 
         const timestamp = Date.now();
 
+        // XP Batch
+        const xpRes = Gamification.calculateTransactionXP('combo_entry', { itemCount: combo.items.length });
+        Gamification.addXP(xpRes.xp);
+
         combo.items.forEach(item => {
              const data = {
                  desc: item.desc,
@@ -531,11 +540,11 @@ export const App = {
                  parent_name: combo.name,
                  type: 'food'
              };
-             App.addMealToDB(data);
+             App.addMealToDB(data, true);
         });
 
         Modal.close('add-food');
-        alert(`Combo "${combo.name}" adicionado em ${Input.cat}!`);
+        alert(`Combo "${combo.name}" adicionado em ${Input.cat}!\n${xpRes.message} (+${xpRes.xp} XP)`);
     },
 
     deleteCombo: (id) => {
@@ -807,9 +816,12 @@ export const App = {
             type: 'food',
             score: 5
         };
-        App.addMealToDB(data);
+
+        const xpRes = Gamification.calculateTransactionXP('meal_entry');
+        Gamification.addXP(xpRes.xp);
+
+        App.addMealToDB(data, true);
         Modal.close('add-food');
-        // Clear inputs...
     },
 
     addExercise: () => {
@@ -824,15 +836,22 @@ export const App = {
             type: 'exercise',
             macros: { p:0, c:0, f:0, fib:0 }
         };
-        App.addMealToDB(data);
+
+        const xpRes = Gamification.calculateTransactionXP('meal_entry'); // Exercise counts as entry
+        Gamification.addXP(xpRes.xp);
+
+        App.addMealToDB(data, true);
         Modal.close('add-food');
     },
 
-    addMealToDB: (data) => {
+    addMealToDB: (data, skipXP = false) => {
         const meals = DB.getMeals();
         meals.push({ id: Date.now() + Math.random(), dateKey: DB.getTodayKey(), ...data });
         DB.set('meals', meals);
-        Gamification.addXP(20);
+
+        if (!skipXP) {
+            Gamification.addXP(50); // Fallback for direct calls (like quick add)
+        }
         App.refreshUI();
     },
 

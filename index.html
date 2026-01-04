@@ -186,11 +186,9 @@
         <!-- TOP HEADER -->
         <header class="glass-header h-16 px-4 flex justify-between items-center z-30 absolute top-0 w-full">
             <div class="flex items-center gap-3">
-                <div class="relative">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
-                        <i class="fas fa-leaf text-sm"></i>
-                    </div>
-                    <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-bold px-1 rounded-full border border-white text-yellow-900" id="user-level-badge">LVL 1</div>
+                <div class="relative header-profile-container">
+                    <img id="header-profile-img" src="" class="w-9 h-9 rounded-full object-cover bg-gray-200 border border-brand-500" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                    <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-bold px-1 rounded-full border border-white text-yellow-900 shadow-sm" id="user-level-badge">LVL 1</div>
                 </div>
                 <div>
                     <h1 class="font-bold text-sm text-gray-800 dark:text-white leading-tight" id="header-username">Quantix<span class="text-brand-500">AI</span></h1>
@@ -476,11 +474,13 @@
             <div id="tab-profile" class="tab-content hidden space-y-6">
                 <!-- Profile Header -->
                 <div class="text-center pt-2">
-                    <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-brand-300 to-brand-600 p-1 shadow-glow-green">
-                        <div class="w-full h-full rounded-full bg-white dark:bg-dark-card flex items-center justify-center">
-                            <i class="fas fa-user text-4xl text-gray-300"></i>
+                    <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-brand-300 to-brand-600 p-1 shadow-glow-green relative group cursor-pointer transition-transform hover:scale-105" onclick="document.getElementById('inp-profile-pic').click()">
+                        <img id="profile-main-img" class="w-full h-full rounded-full object-cover bg-white dark:bg-dark-card" src="" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                        <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm">
+                            <i class="fas fa-camera text-white text-xl"></i>
                         </div>
                     </div>
+                    <input type="file" id="inp-profile-pic" class="hidden" accept="image/*" onchange="Profile.handleImageUpload(this)">
                     <h2 class="text-xl font-bold mt-3 text-gray-800 dark:text-white">Meu Perfil</h2>
                     <p class="text-xs text-gray-400" id="profile-subtitle">Iniciante • Nível 1</p>
                 </div>
