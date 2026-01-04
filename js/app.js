@@ -65,8 +65,27 @@ export const App = {
         // Start Reminders
         App.scheduleReminders();
 
+        // Manual Refresh Trigger
+        const profileImg = document.getElementById('header-profile-img');
+        if (profileImg) {
+            profileImg.onclick = () => {
+                if(confirm("Deseja atualizar o sistema?")) {
+                    window.location.reload(true);
+                }
+            };
+        }
+
+        // Date tracker
+        let lastDateCheck = moment().format('YYYY-MM-DD');
+
         // Ticker for fasting
         setInterval(() => {
+            const current = moment().format('YYYY-MM-DD');
+            if (current !== lastDateCheck) {
+                lastDateCheck = current;
+                App.refreshUI();
+            }
+
             const stats = DB.getDayStats(); const today = DB.getTodayKey();
             if(stats[today] && stats[today].fastingStart) App.refreshUI();
         }, 1000);
