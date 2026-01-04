@@ -215,104 +215,25 @@ export const App = {
         if (meals.length === 0) {
             feed.innerHTML = `<div class="text-center py-10 opacity-50"><i class="fas fa-utensils text-4xl text-gray-300 mb-2"></i><p class="text-xs text-gray-400">Seu diário está vazio hoje.</p></div>`;
         } else {
-            // Sort by time (newest first)
-            meals.sort((a,b) => b.timestamp - a.timestamp).forEach(m => {
-                const time = moment(m.timestamp).format('HH:mm');
-                const isEx = m.type === 'exercise';
+             // Group meals
+             const groups = {};
+             meals.forEach(m => {
+                 const key = m.parent_id || m.timestamp || m.id;
+                 if(!groups[key]) groups[key] = { id: key, items: [], time: m.timestamp, name: m.parent_name, cat: m.category };
+                 groups[key].items.push(m);
+             });
 
-                // Badges for High Sodium/Sugar
-                let badges = "";
-                if (!isEx && m.micros) {
-                    if (m.micros.sodium > 400) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-red-500" title="Alto Sódio"></span>`;
-                    if (m.micros.sugar > 15) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-orange-500" title="Alto Açúcar"></span>`;
-                }
+             const sortedGroups = Object.values(groups).sort((a,b) => b.time - a.time);
 
-                // Symptom Tags
-                let symptomTags = "";
-                if (!isEx) {
-                    symptomTags = UI.getSymptomTags(m.symptoms);
-                }
-
-                // Dynamic Icon Color based on Score
-                let iconClass = "bg-brand-50 text-brand-500";
-                if (!isEx && m.score) {
-                    if (m.score >= 8) iconClass = "bg-green-100 text-green-500";
-                    else if (m.score >= 5) iconClass = "bg-yellow-100 text-yellow-600";
-                    else iconClass = "bg-red-100 text-red-500";
-                }
-                if (isEx) iconClass = "bg-blue-100 text-blue-500";
-
-                // Score Badge
-                let scoreBadge = "";
-                if (!isEx && m.score) {
-                    let scoreColor = m.score >= 8 ? "text-green-600 bg-green-50 border-green-100" :
-                                     m.score >= 5 ? "text-yellow-600 bg-yellow-50 border-yellow-100" :
-                                     "text-red-500 bg-red-50 border-red-100";
-                    scoreBadge = `<span class="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded border ${scoreColor} dark:bg-opacity-10 dark:border-opacity-10">Score: ${m.score}</span>`;
-                }
-
-                const el = document.createElement('div');
-                el.className = "flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up";
-                el.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full ${iconClass} dark:bg-opacity-20 flex items-center justify-center">
-                            <i class="fas ${isEx ? 'fa-running' : (m.category === 'Café da Manhã' ? 'fa-mug-hot' : 'fa-utensils')}"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-800 dark:text-white truncate w-32 sm:w-48">
-                                ${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
-                                ${badges}
-                            </h4>
-                            <p class="text-[9px] text-gray-400 font-bold flex items-center gap-2 flex-wrap mt-0.5">
-                                ${m.category || 'Atividade'} • ${time}
-                                ${scoreBadge}
-                            </p>
-                            ${symptomTags ? `<div class="mt-1 flex flex-wrap gap-1">${symptomTags}</div>` : ''}
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-end gap-1">
-                        <div class="text-right">
-                            <span class="block text-xs font-black ${isEx ? 'text-blue-500' : 'text-gray-800 dark:text-white'}">${isEx ? '-' : '+'}${m.cals}</span>
-                            ${!isEx ? `<span class="text-[8px] text-gray-400">P:${m.macros.p} C:${m.macros.c} G:${m.macros.f}</span>` : ''}
-                        </div>
-                        <div id="action-container-${m.id}"></div>
-                    </div>
-                `;
-
-                // Inject Symptom Button via DOM
-                if (!isEx) {
-                    // We need to do this after appending `el` or by creating the button and appending it to a placeholder.
-                    // Since `el.innerHTML` is set, we can find the placeholder or append to the container.
-                    // Easier: create the container in HTML string (id unique) then append button.
-                }
-
-                // Wrapper for delete button to align better
-                const rightCol = document.createElement('div');
-                rightCol.className = "flex items-center ml-2";
-
-                const delBtn = document.createElement('button');
-                delBtn.className = "text-gray-300 hover:text-red-500 p-2";
-                delBtn.innerHTML = "<i class='fas fa-times'></i>";
-                delBtn.onclick = () => { if(confirm('Apagar item?')) App.deleteMeal(m.id); };
-                rightCol.appendChild(delBtn);
-
-                el.appendChild(rightCol);
-
-                feed.appendChild(el);
-
-                // Now that `el` is in DOM (or we can access it before), we can attach the symptom button.
-                // Wait, `el` is created but appended at end. We can modify `el` before appending.
-                if (!isEx) {
-                    const actionContainer = el.querySelector(`[id="action-container-${m.id}"]`);
-                    if (actionContainer) {
-                        const symBtn = document.createElement('button');
-                        symBtn.className = "text-[10px] text-gray-400 hover:text-brand-500 font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-transparent hover:border-brand-200 hover:bg-brand-50 transition";
-                        symBtn.innerHTML = `<i class="far fa-smile"></i> ${m.symptoms && m.symptoms.length > 0 ? 'Editar' : 'Sentiu?'}`;
-                        symBtn.onclick = () => App.openSymptoms(m.id);
-                        actionContainer.appendChild(symBtn);
-                    }
-                }
-            });
+             sortedGroups.forEach(g => {
+                 if (g.items.length === 1 && !g.name) {
+                     // Single Item
+                     feed.appendChild(App.createMealCard(g.items[0]));
+                 } else {
+                     // Combo Group
+                     feed.appendChild(App.createComboCard(g));
+                 }
+             });
         }
 
         // Check Gamification
@@ -498,6 +419,12 @@ export const App = {
         const timestamp = Date.now();
         let totalCals = 0;
 
+        // Determine parent name if saving as combo
+        let parentName = null;
+        if (chkCombo.checked) {
+             parentName = document.getElementById('inp-combo-name').value.trim();
+        }
+
         App.reviewItems.forEach(item => {
              const data = {
                  desc: item.desc,
@@ -508,6 +435,8 @@ export const App = {
                  score: item.score || 5, // Use AI score or default
                  category: Input.cat,
                  timestamp: timestamp, // Grouped by same time
+                 parent_id: timestamp,
+                 parent_name: parentName,
                  type: 'food'
              };
              App.addMealToDB(data);
@@ -598,6 +527,8 @@ export const App = {
                  score: item.score || 5,
                  category: Input.cat,
                  timestamp: timestamp, // All items grouped
+                 parent_id: timestamp,
+                 parent_name: combo.name,
                  type: 'food'
              };
              App.addMealToDB(data);
@@ -703,6 +634,159 @@ export const App = {
         let meals = DB.getMeals().filter(m => m.id !== id);
         DB.set('meals', meals);
         App.refreshUI();
+    },
+
+    // --- RENDER HELPERS ---
+    createMealCard: (m, isChild = false) => {
+        const time = moment(m.timestamp).format('HH:mm');
+        const isEx = m.type === 'exercise';
+
+        // Badges for High Sodium/Sugar
+        let badges = "";
+        if (!isEx && m.micros) {
+            if (m.micros.sodium > 400) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-red-500" title="Alto Sódio"></span>`;
+            if (m.micros.sugar > 15) badges += `<span class="inline-block ml-1 w-2 h-2 rounded-full bg-orange-500" title="Alto Açúcar"></span>`;
+        }
+
+        // Symptom Tags
+        let symptomTags = "";
+        if (!isEx) {
+            symptomTags = UI.getSymptomTags(m.symptoms);
+        }
+
+        // Dynamic Icon Color based on Score
+        let iconClass = "bg-brand-50 text-brand-500";
+        if (!isEx && m.score) {
+            if (m.score >= 8) iconClass = "bg-green-100 text-green-500";
+            else if (m.score >= 5) iconClass = "bg-yellow-100 text-yellow-600";
+            else iconClass = "bg-red-100 text-red-500";
+        }
+        if (isEx) iconClass = "bg-blue-100 text-blue-500";
+
+        // Score Badge
+        let scoreBadge = "";
+        if (!isEx && m.score) {
+            let scoreColor = m.score >= 8 ? "text-green-600 bg-green-50 border-green-100" :
+                                m.score >= 5 ? "text-yellow-600 bg-yellow-50 border-yellow-100" :
+                                "text-red-500 bg-red-50 border-red-100";
+            scoreBadge = `<span class="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded border ${scoreColor} dark:bg-opacity-10 dark:border-opacity-10">Score: ${m.score}</span>`;
+        }
+
+        const el = document.createElement('div');
+        // Indentation and styling for Child vs Parent/Single
+        if (isChild) {
+             // Nested look: indented, lighter bg, left border
+             el.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl mb-2 ml-4 border-l-4 border-brand-100 dark:border-brand-900 shadow-sm animate-fade-in";
+        } else {
+             // Standard Card
+             el.className = "flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up mb-3";
+        }
+
+        el.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${iconClass} dark:bg-opacity-20 flex items-center justify-center">
+                    <i class="fas ${isEx ? 'fa-running' : (m.category === 'Café da Manhã' ? 'fa-mug-hot' : 'fa-utensils')}"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-800 dark:text-white truncate w-32 sm:w-48">
+                        ${m.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                        ${badges}
+                    </h4>
+                    <p class="text-[9px] text-gray-400 font-bold flex items-center gap-2 flex-wrap mt-0.5">
+                        ${m.category || 'Atividade'} • ${time}
+                        ${scoreBadge}
+                    </p>
+                    ${symptomTags ? `<div class="mt-1 flex flex-wrap gap-1">${symptomTags}</div>` : ''}
+                </div>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+                <div class="text-right">
+                    <span class="block text-xs font-black ${isEx ? 'text-blue-500' : 'text-gray-800 dark:text-white'}">${isEx ? '-' : '+'}${m.cals}</span>
+                    ${!isEx ? `<span class="text-[8px] text-gray-400">P:${m.macros.p} C:${m.macros.c} G:${m.macros.f}</span>` : ''}
+                </div>
+                <div id="action-container-${m.id}"></div>
+            </div>
+        `;
+
+        // Wrapper for delete button
+        const rightCol = document.createElement('div');
+        rightCol.className = "flex items-center ml-2";
+
+        const delBtn = document.createElement('button');
+        delBtn.className = "text-gray-300 hover:text-red-500 p-2";
+        delBtn.innerHTML = "<i class='fas fa-times'></i>";
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            if(confirm('Apagar item?')) App.deleteMeal(m.id);
+        };
+        rightCol.appendChild(delBtn);
+
+        el.appendChild(rightCol);
+
+        // Symptom Button
+        if (!isEx) {
+            const actionContainer = el.querySelector(`[id="action-container-${m.id}"]`);
+            if (actionContainer) {
+                const symBtn = document.createElement('button');
+                symBtn.className = "text-[10px] text-gray-400 hover:text-brand-500 font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-transparent hover:border-brand-200 hover:bg-brand-50 transition";
+                symBtn.innerHTML = `<i class="far fa-smile"></i> ${m.symptoms && m.symptoms.length > 0 ? 'Editar' : 'Sentiu?'}`;
+                symBtn.onclick = (e) => {
+                     e.stopPropagation();
+                     App.openSymptoms(m.id);
+                };
+                actionContainer.appendChild(symBtn);
+            }
+        }
+
+        return el;
+    },
+
+    createComboCard: (group) => {
+        let totalCals = 0;
+        group.items.forEach(i => totalCals += i.cals);
+
+        const time = moment(group.time).format('HH:mm');
+        const title = group.name || `${group.cat} • ${time}`;
+
+        const el = document.createElement('div');
+        el.className = "bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up mb-3 overflow-hidden";
+
+        el.innerHTML = `
+            <div onclick="App.toggleGroup('${group.id}')" class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition select-none">
+                <div class="flex items-center gap-3">
+                     <div class="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-sm">
+                        <i class="fas fa-layer-group"></i>
+                     </div>
+                     <div>
+                        <h4 class="text-sm font-bold text-gray-800 dark:text-white">${title}</h4>
+                        <p class="text-[10px] text-gray-400 font-bold">${group.items.length} itens • ${Math.round(totalCals)} kcal</p>
+                     </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-black text-gray-800 dark:text-white">+${Math.round(totalCals)}</span>
+                    <div class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+                        <i id="chevron-${group.id}" class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="group-${group.id}" class="hidden flex flex-col pb-3 pr-3 pt-1">
+                <!-- Children -->
+            </div>
+        `;
+
+        const container = el.querySelector(`#group-${group.id}`);
+        group.items.forEach(item => {
+            container.appendChild(App.createMealCard(item, true));
+        });
+
+        return el;
+    },
+
+    toggleGroup: (id) => {
+        const g = document.getElementById(`group-${id}`);
+        const c = document.getElementById(`chevron-${id}`);
+        if(g) g.classList.toggle('hidden');
+        if(c) c.classList.toggle('rotate-180');
     },
 
     addManual: () => {
