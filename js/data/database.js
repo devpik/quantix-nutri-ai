@@ -36,16 +36,39 @@ export const DB = {
     // --- Models ---
 
     getProfile: () => {
-        const p = DB.get('profile', {
+        let p = DB.get('profile', {
             name: '', weight: 70, height: 170, age: 30, gender: 'male',
             target: 2000, fiberTarget: 25, strategy: 'balanced',
             microTargets: { sodium: 2300, sugar: 50, vitamins: { a: 100, c: 100, d: 100 } },
             customMacros: { p: 30, c: 40, f: 30 }, credits: 50, xp: 0,
-            level: 1, badges: [], weightHistory: [], measurementsHistory: [], onboardingDone: false
+            level: 1, badges: [], weightHistory: [], measurementsHistory: [], onboardingDone: false,
+            // New Fields
+            profile_image_url: null,
+            streak_days: 0,
+            last_activity_timestamp: null,
+            achievements_unlocked: []
         });
+
+        // Migrations / Default Checks
         if (!p.microTargets) p.microTargets = { sodium: 2300, sugar: 50, vitamins: { a: 100, c: 100, d: 100 } };
         if (!p.measurementsHistory) p.measurementsHistory = [];
         if (!p.weightHistory) p.weightHistory = [];
+        if (p.profile_image_url === undefined) p.profile_image_url = null;
+        if (p.streak_days === undefined) {
+             // Try to migrate from old streak key
+             const oldStreak = DB.get('streak', null);
+             if (oldStreak) {
+                 p.streak_days = oldStreak.current || 0;
+                 p.last_activity_timestamp = oldStreak.lastLogin || null;
+             } else {
+                 p.streak_days = 0;
+                 p.last_activity_timestamp = null;
+             }
+        }
+        if (p.achievements_unlocked === undefined) {
+            p.achievements_unlocked = p.badges || [];
+        }
+
         return p;
     },
 
@@ -78,7 +101,11 @@ export const DB = {
         return allStats;
     },
 
-    getStreak: () => DB.get('streak', { current: 0, lastLogin: null, max: 0 }),
+    // Legacy Streak getter (kept for compatibility during transition, but profile.streak_days should be used)
+    getStreak: () => {
+        const p = DB.getProfile();
+        return { current: p.streak_days, lastLogin: p.last_activity_timestamp, max: 0 }; // Max not persisted in new schema but could be added if needed
+    },
 
     getCombos: () => DB.get('combos', []),
 

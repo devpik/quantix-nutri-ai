@@ -132,6 +132,13 @@ export const Profile = {
 
     loadToUI: () => {
         const p = DB.getProfile();
+
+        // Image
+        const imgEl = document.getElementById('profile-main-img');
+        if(imgEl) {
+             imgEl.src = p.profile_image_url || `https://ui-avatars.com/api/?name=${p.name || 'User'}&background=random`;
+        }
+
         document.getElementById('prof-name').value = p.name || '';
         document.getElementById('prof-weight').value = p.weight;
         document.getElementById('prof-height').value = p.height;
@@ -170,6 +177,44 @@ export const Profile = {
 
         Profile.toggleCustomMacros();
         Profile.updateBMI();
+    },
+
+    handleImageUpload: (input) => {
+        const file = input.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) return alert("Imagem muito grande! Máx 2MB.");
+
+        const r = new FileReader();
+        r.onload = (e) => {
+            const base64 = e.target.result;
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxDim = 300;
+                let w = img.width;
+                let h = img.height;
+
+                if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
+                else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
+
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                const resized = canvas.toDataURL('image/jpeg', 0.8);
+
+                const p = DB.getProfile();
+                p.profile_image_url = resized;
+                DB.set('profile', p);
+
+                Profile.loadToUI();
+                Gamification.updateUI();
+                // alert("Foto de perfil atualizada!");
+            };
+        };
+        r.readAsDataURL(file);
     },
 
     updateApiUsage: (metadata) => {
