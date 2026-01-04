@@ -193,14 +193,12 @@ export const Analytics = {
         // 1.5.1 Average Intake Chart (New Card)
         // Calculate total intake for the period
         let totalIntake = 0;
-        let validDays = 0;
 
         if (daysToRender === 1) {
             // Sum all non-exercise meals for today
             const k = DB.getTodayKey();
             const todaysMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
             totalIntake = todaysMeals.reduce((acc, m) => acc + m.cals, 0);
-            validDays = 1;
         } else {
             // Sum daily averages? Or total average? Instructions say "Average of calories consumed".
             for (let i = daysToRender - 1; i >= 0; i--) {
@@ -209,12 +207,11 @@ export const Analytics = {
                 const dayMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
                 if (dayMeals.length > 0) {
                     totalIntake += dayMeals.reduce((acc, m) => acc + m.cals, 0);
-                    validDays++;
                 }
             }
         }
 
-        const avgIntake = validDays > 0 ? Math.round(totalIntake / validDays) : 0;
+        const avgIntake = daysToRender > 0 ? Math.round(totalIntake / daysToRender) : 0;
         const targetCals = p.target || 2000;
         const intakePct = Math.min(Math.round((avgIntake / targetCals) * 100), 100);
 
@@ -287,7 +284,7 @@ export const Analytics = {
             }],
             options: {
                 scales: {
-                     y: { display: true } // Visible Scale requested
+                     y: { display: true, beginAtZero: false, grace: '10%' }
                 }
             }
         });
@@ -382,7 +379,6 @@ export const Analytics = {
             const dayMeals = meals.filter(m => m.dateKey === k && m.type === 'food');
 
             if (dayMeals.length > 0) {
-                countDays++;
                 dayMeals.forEach(m => {
                     if (m.micros) {
                         totalSodium += (m.micros.sodium || 0);
@@ -392,8 +388,8 @@ export const Analytics = {
             }
         }
 
-        const avgSodium = countDays > 0 ? totalSodium / countDays : 0;
-        const avgSugar = countDays > 0 ? totalSugar / countDays : 0;
+        const avgSodium = range > 0 ? totalSodium / range : 0;
+        const avgSugar = range > 0 ? totalSugar / range : 0;
 
         // Targets
         const targetSodium = (p.microTargets && p.microTargets.sodium) || 2300;
