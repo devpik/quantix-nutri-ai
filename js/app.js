@@ -87,7 +87,7 @@ export const App = {
             }
 
             const stats = DB.getDayStats(); const today = DB.getTodayKey();
-            if(stats[today] && stats[today].fastingStart) App.refreshUI();
+            if(stats[today] && stats[today].fastingStart) App.updateFastingTimer();
         }, 1000);
 
         // Event Listener para fechar modal com ESC
@@ -159,6 +159,20 @@ export const App = {
     },
 
     // --- CORE: DATA REFRESH ---
+    updateFastingTimer: () => {
+        const today = DB.getTodayKey();
+        const stats = DB.getDayStats()[today];
+        if (!stats || !stats.fastingStart) return;
+
+        const diff = Math.floor((Date.now() - stats.fastingStart) / 1000);
+        const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        const s = String(diff % 60).padStart(2, '0');
+
+        const elTimer = document.getElementById('fasting-timer');
+        if(elTimer) elTimer.innerText = `${h}:${m}:${s}`;
+    },
+
     refreshUI: () => {
         if (!App.macroChart) App.initMacroChart();
         const today = DB.getTodayKey();
