@@ -1,5 +1,6 @@
 import { DB } from '../data/database.js';
 import { ChatUI } from './chat.js';
+import { UI } from './interface.js';
 
 export const Analytics = {
     charts: {},
@@ -37,7 +38,7 @@ export const Analytics = {
     },
 
     // --- HELPER: Dynamic Container Creation ---
-    getOrCreateContainer: (id, title, afterElementId, heightClass = 'h-48') => {
+    getOrCreateContainer: (id, title, afterElementId, heightClass = 'h-48', legend = null) => {
         let container = document.getElementById(id);
         if (!container) {
             container = document.createElement('div');
@@ -45,6 +46,7 @@ export const Analytics = {
             container.className = "glass-panel p-4 rounded-3xl animate-fade-in mb-4";
             container.innerHTML = `
                 <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">${title}</h3>
+                ${legend ? `<p class="text-[10px] text-gray-400 mt-2 mb-2">${legend}</p>` : ''}
                 <div class="${heightClass} w-full relative">
                     <canvas id="canvas-${id}"></canvas>
                 </div>
@@ -472,7 +474,8 @@ export const Analytics = {
     },
 
     renderMealDistribution: (meals, p, range) => {
-        const canvasId = Analytics.getOrCreateContainer('chart-meal-dist', 'Distribuição por Refeição', 'chart-intake');
+        const legend = "Busque preencher o gráfico uniformemente ou seguir a linha pontilhada (meta).";
+        const canvasId = Analytics.getOrCreateContainer('chart-meal-dist', 'Distribuição por Refeição', 'chart-intake', 'h-48', legend);
         const categories = ['Café da Manhã', 'Almoço', 'Lanche', 'Jantar'];
         const dataMap = { 'Café da Manhã': 0, 'Almoço': 0, 'Lanche': 0, 'Jantar': 0 };
         const dates = Analytics.getDatesInRange(range);
@@ -520,7 +523,8 @@ export const Analytics = {
     },
 
     renderEnergyBalance: (dateKeys, meals, p) => {
-        const canvasId = Analytics.getOrCreateContainer('chart-energy-balance', 'Saldo Energético (Déficit/Superávit)', 'chart-exercise');
+        const legend = "Barras Verdes indicam déficit (perda de peso). Barras Vermelhas indicam superávit.";
+        const canvasId = Analytics.getOrCreateContainer('chart-energy-balance', 'Saldo Energético (Déficit/Superávit)', 'chart-exercise', 'h-48', legend);
         const labels = [];
         const dataBalance = [];
         let totalBalance = 0;
@@ -566,7 +570,8 @@ export const Analytics = {
     },
 
     renderQualityMatrix: (meals, range) => {
-        const canvasId = Analytics.getOrCreateContainer('chart-quality-matrix', 'Matriz: Qualidade vs Calorias', 'chart-quality');
+        const legend = "Objetivo: Manter refeições no topo esquerdo (Alta Qualidade Nutricional e Baixa Caloria).";
+        const canvasId = Analytics.getOrCreateContainer('chart-quality-matrix', 'Matriz: Qualidade vs Calorias', 'chart-quality', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataPoints = [];
 
@@ -615,7 +620,8 @@ export const Analytics = {
     },
 
     renderTopOffenders: (meals, range) => {
-        const canvasId = Analytics.getOrCreateContainer('chart-top-offenders', 'Top 5 Ofensores (Sódio)', 'metabolic-health-section');
+        const legend = "Alimentos que mais impactam sua cota diária de Sódio. Considere reduzir a porção.";
+        const canvasId = Analytics.getOrCreateContainer('chart-top-offenders', 'Top 5 Ofensores (Sódio)', 'metabolic-health-section', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const sodiumMap = {};
 
@@ -647,16 +653,24 @@ export const Analytics = {
     },
 
     renderSymptomCorrelation: (meals, range) => {
-        const canvasId = Analytics.getOrCreateContainer('chart-symptoms', 'Frequência de Sintomas', 'chart-top-offenders');
+        const legend = "Identifique quais sensações são mais recorrentes após suas refeições.";
+        const canvasId = Analytics.getOrCreateContainer('chart-symptoms', 'Frequência de Sintomas', 'chart-top-offenders', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const symptomCounts = {};
         let hasSymptoms = false;
+        const symptomEvents = [];
 
         meals.forEach(m => {
             if (dates.includes(m.dateKey) && m.symptoms && Array.isArray(m.symptoms)) {
                 m.symptoms.forEach(s => {
                     symptomCounts[s] = (symptomCounts[s] || 0) + 1;
                     hasSymptoms = true;
+                    symptomEvents.push({
+                        id: s,
+                        dateLabel: new Date(m.dateKey).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                        timestamp: new Date(m.timestamp).getTime(),
+                        mealName: m.desc
+                    });
                 });
             }
         });
@@ -666,6 +680,7 @@ export const Analytics = {
         if (!hasSymptoms) {
             container.innerHTML = `
                 <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Frequência de Sintomas</h3>
+                <p class="text-[10px] text-gray-400 mt-2 mb-2">${legend}</p>
                 <p class="text-xs text-center text-gray-400 py-8">Nenhum sintoma registrado no período.</p>
             `;
             return;
@@ -675,6 +690,7 @@ export const Analytics = {
         if (!document.getElementById(canvasId)) {
             container.innerHTML = `
                 <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Frequência de Sintomas</h3>
+                <p class="text-[10px] text-gray-400 mt-2 mb-2">${legend}</p>
                 <div class="h-48 w-full relative">
                     <canvas id="${canvasId}"></canvas>
                 </div>
@@ -682,9 +698,10 @@ export const Analytics = {
         }
 
         const sorted = Object.entries(symptomCounts).sort((a, b) => b[1] - a[1]);
+        const getLabel = (id) => (UI.symptomOptions || []).find(opt => opt.id === id)?.label || id;
 
         Analytics.drawChart(canvasId, 'bar', {
-            labels: sorted.map(i => i[0]),
+            labels: sorted.map(i => getLabel(i[0])),
             datasets: [{
                 label: 'Ocorrências',
                 data: sorted.map(i => i[1]),
@@ -692,6 +709,47 @@ export const Analytics = {
                 borderRadius: 4
             }]
         });
+
+        // Drill-down: Rastreamento de Causas
+        const existingList = document.getElementById('symptoms-drilldown');
+        if(existingList) existingList.remove();
+
+        symptomEvents.sort((a, b) => b.timestamp - a.timestamp);
+        const top5 = symptomEvents.slice(0, 5);
+
+        if(top5.length > 0) {
+            const drillDown = document.createElement('div');
+            drillDown.id = 'symptoms-drilldown';
+            drillDown.className = "mt-4 border-t border-gray-100 dark:border-gray-700 pt-4";
+            drillDown.innerHTML = '<h4 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Rastreamento de Causas</h4>';
+
+            const list = document.createElement('div');
+            list.className = "flex flex-col gap-1";
+
+            top5.forEach(item => {
+                const opt = (UI.symptomOptions || []).find(o => o.id === item.id);
+                const icon = opt ? opt.icon : '❓';
+                const label = opt ? opt.label : item.id;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = "flex justify-between items-center text-xs p-2 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition rounded-lg";
+
+                // Securely create elements to prevent XSS
+                const leftSpan = document.createElement('span');
+                leftSpan.className = "font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2";
+                leftSpan.innerHTML = `<span>${icon}</span> ${label}`; // Icon and label are from UI options (safe)
+
+                const rightSpan = document.createElement('span');
+                rightSpan.className = "text-gray-400 text-[10px]";
+                rightSpan.textContent = `${item.mealName} - ${item.dateLabel}`; // User content (safe textContent)
+
+                itemEl.appendChild(leftSpan);
+                itemEl.appendChild(rightSpan);
+                list.appendChild(itemEl);
+            });
+            drillDown.appendChild(list);
+            container.appendChild(drillDown);
+        }
     },
 
     drawChart: (id, type, data, extraOptions = {}) => {
