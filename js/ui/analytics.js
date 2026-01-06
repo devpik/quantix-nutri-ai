@@ -1,6 +1,7 @@
 import { DB } from '../data/database.js';
 import { ChatUI } from './chat.js';
 import { UI } from './interface.js';
+import { I18n } from '../services/i18n.js';
 
 export const Analytics = {
     charts: {},
@@ -64,11 +65,17 @@ export const Analytics = {
                 const tab = document.getElementById('tab-analytics');
                 if (tab) tab.appendChild(container);
             }
+        } else {
+             // Update texts if exists (for language switching)
+             const h3 = container.querySelector('h3');
+             if(h3) h3.innerText = title;
+             const p = container.querySelector('p');
+             if(p && legend) p.innerText = legend;
         }
         return `canvas-${id}`;
     },
 
-    renderNoData: (canvasId, message = "Sem dados para este período") => {
+    renderNoData: (canvasId, message = null) => {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         const container = canvas.parentElement;
@@ -77,6 +84,8 @@ export const Analytics = {
         // Check if message already exists
         if (container.querySelector('.no-data-msg')) return;
 
+        const msgText = message || I18n.t("analytics.no_data");
+
         // Hide canvas, show message
         canvas.style.display = 'none';
 
@@ -84,7 +93,7 @@ export const Analytics = {
         msg.className = 'no-data-msg absolute inset-0 flex flex-col items-center justify-center text-center opacity-70';
         msg.innerHTML = `
             <i class="fas fa-chart-area text-gray-300 text-2xl mb-2"></i>
-            <span class="text-[10px] text-gray-400 font-bold">${message}</span>
+            <span class="text-[10px] text-gray-400 font-bold">${msgText}</span>
         `;
         container.appendChild(msg);
     },
@@ -206,7 +215,7 @@ export const Analytics = {
              avgIntakeValEl.innerHTML = `${avgIntake} <span class="text-xs font-medium text-gray-400">kcal</span> ${Math.abs(diffTarget) > 50 ? trendIcon : ''}`;
              const pctEl = document.getElementById('avg-intake-pct');
              if(pctEl) {
-                 pctEl.innerText = `${intakePct}% da meta`;
+                 pctEl.innerText = I18n.t("analytics.goal_pct", { pct: intakePct });
                  pctEl.style.marginTop = '4px'; // Fix alignment for avg-intake-pct
              }
         }
@@ -216,7 +225,7 @@ export const Analytics = {
             Analytics.renderNoData('chart-intake');
         } else {
             Analytics.drawChart('chart-intake', 'doughnut', {
-                labels: ['Consumido', 'Restante'],
+                labels: [I18n.t("analytics.chart_intake_consumed"), I18n.t("analytics.chart_intake_remaining")],
                 datasets: [{
                     data: [avgIntake, Math.max(0, targetCals - avgIntake)],
                     backgroundColor: [avgIntake > targetCals ? '#ef4444' : '#3b82f6', '#f3f4f6'],
@@ -249,7 +258,7 @@ export const Analytics = {
         const qualityTrend = avgPeriodScore >= 7.5 ? 'text-green-500' : (avgPeriodScore >= 5 ? 'text-yellow-500' : 'text-red-500');
 
         const qualLabel = document.getElementById('avg-quality-label');
-        if (qualLabel) qualLabel.innerHTML = `Média: <span class="${qualityTrend}">${avgPeriodScore.toFixed(1)}</span>`;
+        if (qualLabel) qualLabel.innerHTML = `${I18n.t("analytics.quality_avg")} <span class="${qualityTrend}">${avgPeriodScore.toFixed(1)}</span>`;
 
         Analytics.resetChartState('chart-quality');
         if (daysWithFood === 0) {
@@ -258,7 +267,7 @@ export const Analytics = {
             Analytics.drawChart('chart-quality', 'line', {
                 labels: labels,
                 datasets: [{
-                    label: 'Qualidade (1-10)',
+                    label: I18n.t("analytics.quality_label"),
                     data: dataQuality,
                     borderColor: '#8b5cf6',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -273,18 +282,18 @@ export const Analytics = {
             if (validScores.length > 0) {
                 let msg = "", icon = "";
                 if (avgPeriodScore < 5) {
-                    msg = "Sua dieta contém muitos ultraprocessados. Foco em alimentos naturais!";
+                    msg = I18n.t("analytics.quality_feedback_bad");
                     icon = "<i class='fas fa-exclamation-triangle text-red-500 mt-0.5'></i>";
                 } else if (avgPeriodScore < 8) {
-                    msg = "Bom equilíbrio, mas ainda há espaço para reduzir industrializados.";
+                    msg = I18n.t("analytics.quality_feedback_mixed");
                     icon = "<i class='fas fa-info-circle text-yellow-500 mt-0.5'></i>";
                 } else {
-                    msg = "Excelente! Sua alimentação é rica em nutrientes e comida de verdade.";
+                    msg = I18n.t("analytics.quality_feedback_good");
                     icon = "<i class='fas fa-award text-green-500 mt-0.5'></i>";
                 }
                 feedbackEl.innerHTML = `${icon} <span class="text-xs">${msg}</span>`;
             } else {
-                feedbackEl.innerHTML = "<span class='text-xs'>Sem dados suficientes.</span>";
+                feedbackEl.innerHTML = `<span class='text-xs'>${I18n.t("analytics.no_data_patterns")}</span>`;
             }
         }
 
@@ -295,7 +304,7 @@ export const Analytics = {
             Analytics.drawChart('chart-exercise', 'bar', {
                 labels: labels,
                 datasets: [{
-                    label: 'Queima (kcal)',
+                    label: I18n.t("analytics.burn_label"),
                     data: dataBurn,
                     backgroundColor: '#f59e0b',
                     borderRadius: 4
@@ -312,7 +321,7 @@ export const Analytics = {
             Analytics.drawChart('chart-hydration', 'bar', {
                 labels: labels,
                 datasets: [{
-                    label: 'Água (ml)',
+                    label: I18n.t("analytics.water_label"),
                     data: dataHydration,
                     backgroundColor: '#0ea5e9',
                     borderRadius: 4
@@ -324,7 +333,7 @@ export const Analytics = {
         Analytics.drawChart('chart-weight', 'line', {
             labels: labels,
             datasets: [{
-                label: 'Peso (kg)',
+                label: I18n.t("analytics.weight_label"),
                 data: dataWeight,
                 borderColor: '#16a34a',
                 backgroundColor: 'rgba(22, 163, 74, 0.1)',
@@ -335,9 +344,9 @@ export const Analytics = {
         Analytics.drawChart('chart-measurements', 'line', {
             labels: labels,
             datasets: [
-                { label: 'Cintura', data: dataWaist, borderColor: '#f43f5e', tension: 0.4 },
-                { label: 'Quadril', data: dataHip, borderColor: '#ec4899', tension: 0.4 },
-                { label: '% Gord', data: dataFat, borderColor: '#8b5cf6', tension: 0.4 }
+                { label: I18n.t("analytics.measure_waist"), data: dataWaist, borderColor: '#f43f5e', tension: 0.4 },
+                { label: I18n.t("analytics.measure_hip"), data: dataHip, borderColor: '#ec4899', tension: 0.4 },
+                { label: I18n.t("analytics.measure_fat"), data: dataFat, borderColor: '#8b5cf6', tension: 0.4 }
             ]
         }, { options: { plugins: { legend: { display: true, position: 'bottom' } } } });
 
@@ -357,14 +366,14 @@ export const Analytics = {
                 hourlyContainer.appendChild(peakTextEl);
             }
             peakTextEl.innerHTML = peakVal > 0
-                ? `Seu pico de fome é por volta das <span class="font-bold text-brand-600">${peakHour}h:00</span>`
-                : "Sem dados suficientes para identificar padrões.";
+                ? I18n.t("analytics.peak_hunger", { hour: peakHour })
+                : I18n.t("analytics.no_data_patterns");
         }
 
         Analytics.drawChart('chart-hourly', 'bar', {
             labels: Array.from({length: 24}, (_, i) => i),
             datasets: [{
-                label: 'Média Calórica',
+                label: I18n.t("analytics.avg_label"),
                 data: avgHourly,
                 backgroundColor: avgHourly.map((v, i) => i === peakHour ? '#ef4444' : '#3b82f6'),
                 borderRadius: 2
@@ -439,13 +448,13 @@ export const Analytics = {
     },
 
     renderMacroEvolution: (labels, pData, cData, fData) => {
-        const canvasId = Analytics.getOrCreateContainer('macro-evolution-card', 'Evolução de Macros (g)', 'chart-exercise');
+        const canvasId = Analytics.getOrCreateContainer('macro-evolution-card', I18n.t("analytics.macro_evolution"), 'chart-exercise');
         Analytics.drawChart(canvasId, 'bar', {
             labels: labels,
             datasets: [
-                { label: 'Proteína', data: pData, backgroundColor: '#3b82f6', stack: 'Stack 0' },
-                { label: 'Carbo', data: cData, backgroundColor: '#22c55e', stack: 'Stack 0' },
-                { label: 'Gordura', data: fData, backgroundColor: '#eab308', stack: 'Stack 0' }
+                { label: I18n.t("nutri.protein"), data: pData, backgroundColor: '#3b82f6', stack: 'Stack 0' },
+                { label: I18n.t("nutri.carbs"), data: cData, backgroundColor: '#22c55e', stack: 'Stack 0' },
+                { label: I18n.t("nutri.fat"), data: fData, backgroundColor: '#eab308', stack: 'Stack 0' }
             ]
         }, {
             options: {
@@ -534,13 +543,13 @@ export const Analytics = {
             });
         };
 
-        createBar('Sódio', avgSodium, targetSodium, 'mg');
-        createBar('Açúcar', avgSugar, targetSugar, 'g');
+        createBar(I18n.t("nutri.sodium"), avgSodium, targetSodium, 'mg');
+        createBar(I18n.t("nutri.sugar"), avgSugar, targetSugar, 'g');
     },
 
     renderMealDistribution: (meals, p, range) => {
-        const legend = "Busque preencher o gráfico uniformemente ou seguir a linha pontilhada (meta).";
-        const canvasId = Analytics.getOrCreateContainer('chart-meal-dist', 'Distribuição por Refeição', 'chart-intake', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_meal_dist");
+        const canvasId = Analytics.getOrCreateContainer('chart-meal-dist', I18n.t("analytics.meal_dist"), 'chart-intake', 'h-48', legend);
         const categories = ['Café da Manhã', 'Almoço', 'Lanche', 'Jantar'];
         const dataMap = { 'Café da Manhã': 0, 'Almoço': 0, 'Lanche': 0, 'Jantar': 0 };
         const dates = Analytics.getDatesInRange(range);
@@ -555,18 +564,26 @@ export const Analytics = {
         const dataPct = categories.map(c => Math.round((dataMap[c] / totalCals) * 100));
         const ideal = [20, 40, 15, 25];
 
+        // Translate categories for display
+        const labels = [
+            I18n.t("cat.breakfast"),
+            I18n.t("cat.lunch"),
+            I18n.t("cat.snack"),
+            I18n.t("cat.dinner")
+        ];
+
         Analytics.drawChart(canvasId, 'radar', {
-            labels: categories,
+            labels: labels,
             datasets: [
                 {
-                    label: 'Você (%)',
+                    label: I18n.t("analytics.you"),
                     data: dataPct,
                     backgroundColor: 'rgba(34, 197, 94, 0.2)',
                     borderColor: '#22c55e',
                     pointBackgroundColor: '#22c55e'
                 },
                 {
-                    label: 'Ideal (%)',
+                    label: I18n.t("analytics.ideal"),
                     data: ideal,
                     backgroundColor: 'rgba(156, 163, 175, 0.1)',
                     borderColor: '#9ca3af',
@@ -588,8 +605,8 @@ export const Analytics = {
     },
 
     renderEnergyBalance: (dateKeys, meals, p) => {
-        const legend = "Barras Verdes indicam déficit (perda de peso). Barras Vermelhas indicam superávit.";
-        const canvasId = Analytics.getOrCreateContainer('chart-energy-balance', 'Saldo Energético (Déficit/Superávit)', 'chart-exercise', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_green_bars");
+        const canvasId = Analytics.getOrCreateContainer('chart-energy-balance', I18n.t("analytics.energy_balance"), 'chart-exercise', 'h-48', legend);
         const labels = [];
         const dataBalance = [];
         let totalBalance = 0;
@@ -625,7 +642,7 @@ export const Analytics = {
                         callbacks: {
                             label: (ctx) => {
                                 const v = ctx.raw;
-                                return v > 0 ? `Déficit: ${Math.round(v)} kcal` : `Superávit: ${Math.round(Math.abs(v))} kcal`;
+                                return v > 0 ? I18n.t("analytics.balance_deficit", { val: Math.round(v) }) : I18n.t("analytics.balance_surplus", { val: Math.round(Math.abs(v)) });
                             }
                         }
                     }
@@ -635,8 +652,8 @@ export const Analytics = {
     },
 
     renderQualityMatrix: (meals, range) => {
-        const legend = "Objetivo: Manter refeições no topo esquerdo (Alta Qualidade Nutricional e Baixa Caloria).";
-        const canvasId = Analytics.getOrCreateContainer('chart-quality-matrix', 'Matriz: Qualidade vs Calorias', 'chart-quality', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_quality");
+        const canvasId = Analytics.getOrCreateContainer('chart-quality-matrix', I18n.t("analytics.quality_matrix"), 'chart-quality', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataPoints = [];
 
@@ -654,7 +671,7 @@ export const Analytics = {
 
         Analytics.drawChart(canvasId, 'scatter', {
             datasets: [{
-                label: 'Refeições',
+                label: I18n.t("analytics.meals"),
                 data: dataPoints,
                 backgroundColor: pointColors,
                 pointRadius: 5,
@@ -667,7 +684,7 @@ export const Analytics = {
                         callbacks: {
                             label: (ctx) => {
                                 const pt = ctx.raw;
-                                return `${pt.desc}: ${pt.x}kcal (Nota ${pt.y})`;
+                                return `${pt.desc}: ${pt.x}kcal (Score ${pt.y})`;
                             }
                         }
                     }
@@ -685,8 +702,8 @@ export const Analytics = {
     },
 
     renderTopOffenders: (meals, range) => {
-        const legend = "Alimentos que mais impactam sua cota diária de Sódio. Considere reduzir a porção.";
-        const canvasId = Analytics.getOrCreateContainer('chart-top-offenders', 'Top 5 Ofensores (Sódio)', 'metabolic-health-section', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_offenders");
+        const canvasId = Analytics.getOrCreateContainer('chart-top-offenders', I18n.t("analytics.top_offenders"), 'metabolic-health-section', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const sodiumMap = {};
 
@@ -704,7 +721,7 @@ export const Analytics = {
         Analytics.drawChart(canvasId, 'bar', {
             labels: labels,
             datasets: [{
-                label: 'Sódio Total (mg)',
+                label: I18n.t("analytics.total_sodium"),
                 data: data,
                 backgroundColor: '#ef4444',
                 borderRadius: 4
@@ -718,8 +735,8 @@ export const Analytics = {
     },
 
     renderSymptomCorrelation: (meals, range) => {
-        const legend = "Identifique quais sensações são mais recorrentes após suas refeições.";
-        const canvasId = Analytics.getOrCreateContainer('chart-symptoms', 'Frequência de Sintomas', 'chart-top-offenders', 'h-48', legend);
+        const legend = I18n.t("analytics.symptom_legend");
+        const canvasId = Analytics.getOrCreateContainer('chart-symptoms', I18n.t("analytics.symptom_freq"), 'chart-top-offenders', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const symptomCounts = {};
         let hasSymptoms = false;
@@ -732,7 +749,7 @@ export const Analytics = {
                     hasSymptoms = true;
                     symptomEvents.push({
                         id: s,
-                        dateLabel: new Date(m.dateKey).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+                        dateLabel: new Date(m.dateKey).toLocaleDateString(I18n.locale, { day: '2-digit', month: '2-digit' }),
                         timestamp: new Date(m.timestamp).getTime(),
                         mealName: m.desc
                     });
@@ -744,9 +761,9 @@ export const Analytics = {
 
         if (!hasSymptoms) {
             container.innerHTML = `
-                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Frequência de Sintomas</h3>
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">${I18n.t("analytics.symptom_freq")}</h3>
                 <p class="text-[10px] text-gray-400 mt-2 mb-2">${legend}</p>
-                <p class="text-xs text-center text-gray-400 py-8">Nenhum sintoma registrado no período.</p>
+                <p class="text-xs text-center text-gray-400 py-8">${I18n.t("analytics.symptom_empty")}</p>
             `;
             return;
         }
@@ -754,7 +771,7 @@ export const Analytics = {
         // Restore canvas if it was overwritten by empty state
         if (!document.getElementById(canvasId)) {
             container.innerHTML = `
-                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Frequência de Sintomas</h3>
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">${I18n.t("analytics.symptom_freq")}</h3>
                 <p class="text-[10px] text-gray-400 mt-2 mb-2">${legend}</p>
                 <div class="h-48 w-full relative">
                     <canvas id="${canvasId}"></canvas>
@@ -763,12 +780,12 @@ export const Analytics = {
         }
 
         const sorted = Object.entries(symptomCounts).sort((a, b) => b[1] - a[1]);
-        const getLabel = (id) => (UI.symptomOptions || []).find(opt => opt.id === id)?.label || id;
+        const getLabel = (id) => I18n.t(`symptom.${id}`) || id;
 
         Analytics.drawChart(canvasId, 'bar', {
             labels: sorted.map(i => getLabel(i[0])),
             datasets: [{
-                label: 'Ocorrências',
+                label: I18n.t("analytics.occurrences"),
                 data: sorted.map(i => i[1]),
                 backgroundColor: '#8b5cf6',
                 borderRadius: 4
@@ -786,7 +803,7 @@ export const Analytics = {
             const drillDown = document.createElement('div');
             drillDown.id = 'symptoms-drilldown';
             drillDown.className = "mt-4 border-t border-gray-100 dark:border-gray-700 pt-4";
-            drillDown.innerHTML = '<h4 class="text-[10px] font-bold text-gray-400 uppercase mb-2">Rastreamento de Causas</h4>';
+            drillDown.innerHTML = `<h4 class="text-[10px] font-bold text-gray-400 uppercase mb-2">${I18n.t("analytics.cause_tracking")}</h4>`;
 
             const list = document.createElement('div');
             list.className = "flex flex-col gap-1";
@@ -794,7 +811,7 @@ export const Analytics = {
             top5.forEach(item => {
                 const opt = (UI.symptomOptions || []).find(o => o.id === item.id);
                 const icon = opt ? opt.icon : '❓';
-                const label = opt ? opt.label : item.id;
+                const label = I18n.t(`symptom.${item.id}`);
 
                 const itemEl = document.createElement('div');
                 itemEl.className = "flex justify-between items-center text-xs p-2 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition rounded-lg";
@@ -819,8 +836,8 @@ export const Analytics = {
 
     // New Functions
     renderTopProtein: (meals, range) => {
-        const legend = "Alimentos que mais contribuem para sua ingestão de proteína.";
-        const canvasId = Analytics.getOrCreateContainer('chart-top-protein', 'Top 5 Fontes de Proteína', 'chart-symptoms', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_protein");
+        const canvasId = Analytics.getOrCreateContainer('chart-top-protein', I18n.t("analytics.top_source_protein"), 'chart-symptoms', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataMap = {};
 
@@ -836,7 +853,7 @@ export const Analytics = {
         Analytics.drawChart(canvasId, 'bar', {
             labels: sorted.map(i => i[0]),
             datasets: [{
-                label: 'Proteína (g)',
+                label: I18n.t("nutri.protein_g"),
                 data: sorted.map(i => i[1]),
                 backgroundColor: '#3b82f6',
                 borderRadius: 4
@@ -850,8 +867,8 @@ export const Analytics = {
     },
 
     renderTopCarbs: (meals, range) => {
-        const legend = "Alimentos que mais contribuem para sua ingestão de carboidratos.";
-        const canvasId = Analytics.getOrCreateContainer('chart-top-carbs', 'Top 5 Fontes de Carboidrato', 'chart-top-protein', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_carbs");
+        const canvasId = Analytics.getOrCreateContainer('chart-top-carbs', I18n.t("analytics.top_source_carbs"), 'chart-top-protein', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataMap = {};
 
@@ -867,7 +884,7 @@ export const Analytics = {
         Analytics.drawChart(canvasId, 'bar', {
             labels: sorted.map(i => i[0]),
             datasets: [{
-                label: 'Carboidrato (g)',
+                label: I18n.t("nutri.carbs_g"),
                 data: sorted.map(i => i[1]),
                 backgroundColor: '#22c55e',
                 borderRadius: 4
@@ -881,8 +898,8 @@ export const Analytics = {
     },
 
     renderTopFat: (meals, range) => {
-        const legend = "Alimentos que mais contribuem para sua ingestão de gordura.";
-        const canvasId = Analytics.getOrCreateContainer('chart-top-fat', 'Top 5 Fontes de Gordura', 'chart-top-carbs', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_fat");
+        const canvasId = Analytics.getOrCreateContainer('chart-top-fat', I18n.t("analytics.top_source_fat"), 'chart-top-carbs', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataMap = {};
 
@@ -898,7 +915,7 @@ export const Analytics = {
         Analytics.drawChart(canvasId, 'bar', {
             labels: sorted.map(i => i[0]),
             datasets: [{
-                label: 'Gordura (g)',
+                label: I18n.t("nutri.fat_g"),
                 data: sorted.map(i => i[1]),
                 backgroundColor: '#eab308',
                 borderRadius: 4
@@ -912,8 +929,8 @@ export const Analytics = {
     },
 
     renderTopSugar: (meals, range) => {
-        const legend = "Alimentos que mais contribuem para sua ingestão de açúcar.";
-        const canvasId = Analytics.getOrCreateContainer('chart-top-sugar', 'Top 5 Fontes de Açúcar', 'chart-top-fat', 'h-48', legend);
+        const legend = I18n.t("analytics.legend_sugar");
+        const canvasId = Analytics.getOrCreateContainer('chart-top-sugar', I18n.t("analytics.top_source_sugar"), 'chart-top-fat', 'h-48', legend);
         const dates = Analytics.getDatesInRange(range);
         const dataMap = {};
 
@@ -929,7 +946,7 @@ export const Analytics = {
         Analytics.drawChart(canvasId, 'bar', {
             labels: sorted.map(i => i[0]),
             datasets: [{
-                label: 'Açúcar (g)',
+                label: I18n.t("nutri.sugar_g"),
                 data: sorted.map(i => i[1]),
                 backgroundColor: '#f97316',
                 borderRadius: 4

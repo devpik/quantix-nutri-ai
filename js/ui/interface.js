@@ -68,10 +68,12 @@ export const Modal = {
     open: (id) => {
         if (id === 'add-food') {
             const h = new Date().getHours();
-            if (h >= 5 && h <= 10) Input.setCat('Café da Manhã');
-            else if (h >= 11 && h <= 14) Input.setCat('Almoço');
-            else if (h >= 15 && h <= 17) Input.setCat('Lanche');
-            else Input.setCat('Jantar');
+            let cat = 'Café da Manhã';
+            if (h >= 5 && h <= 10) cat = 'Café da Manhã';
+            else if (h >= 11 && h <= 14) cat = 'Almoço';
+            else if (h >= 15 && h <= 17) cat = 'Lanche';
+            else cat = 'Jantar';
+            Input.setCat(cat);
         }
         document.getElementById('modal-' + id).classList.add('active');
     },
@@ -123,7 +125,12 @@ export const Input = {
         Input.cat = c;
         // Update Chips UI
         document.querySelectorAll('.cat-chip').forEach(el => {
-            if (el.innerText.includes(c.split(' ')[0])) { // Simple matching
+            const translated = UI.getCategoryLabel(c);
+            const cleanText = el.innerText.trim();
+            const originalMatch = c.split(' ')[0]; // Match "Café" in "Café da Manhã"
+
+            // Check against translated label OR original DB value (fallback)
+            if (cleanText === translated || cleanText.includes(translated.split(' ')[0]) || cleanText.includes(originalMatch)) {
                 el.classList.add('active', 'bg-brand-100', 'text-brand-700', 'border-brand-200');
                 el.classList.remove('bg-gray-100');
             } else {
@@ -138,6 +145,20 @@ export const UI = {
     stream: null,
     cameraTarget: 'food',
     portionSize: 1,
+
+    // Helper to map DB categories (Portuguese) to localized strings
+    getCategoryLabel: (dbValue) => {
+        const map = {
+            'Café da Manhã': 'breakfast',
+            'Almoço': 'lunch',
+            'Lanche': 'snack',
+            'Jantar': 'dinner',
+            'Exercício': 'exercise',
+            'Atividade': 'exercise'
+        };
+        const key = map[dbValue] || 'snack'; // default
+        return I18n.t(`cat.${key}`);
+    },
 
     openCamera: async (target = 'food') => {
         UI.cameraTarget = target;
@@ -224,11 +245,11 @@ export const UI = {
 
     // --- SYMPTOM TRACKER UI ---
     symptomOptions: [
-        { id: 'energy', label: 'Energia', icon: '⚡' },
-        { id: 'bloated', label: 'Inchado', icon: '🐡' },
-        { id: 'sleepy', label: 'Sonolento', icon: '😴' },
-        { id: 'light', label: 'Leve/Bem', icon: '🦅' },
-        { id: 'nauseous', label: 'Enjoado', icon: '🤢' }
+        { id: 'energy', icon: '⚡' },
+        { id: 'bloated', icon: '🐡' },
+        { id: 'sleepy', icon: '😴' },
+        { id: 'light', icon: '🦅' },
+        { id: 'nauseous', icon: '🤢' }
     ],
 
     currentMealId: null,
@@ -246,10 +267,10 @@ export const UI = {
                 </div>
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Como você se sentiu?</h3>
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">${I18n.t("symptom.modal_title")}</h3>
                         <button onclick="Modal.close('symptoms')" class="text-gray-400"><i class="fas fa-times text-xl"></i></button>
                     </div>
-                    <p class="text-xs text-gray-400 mb-6">Selecione um ou mais sintomas pós-refeição.</p>
+                    <p class="text-xs text-gray-400 mb-6">${I18n.t("symptom.modal_desc")}</p>
 
                     <div class="grid grid-cols-2 gap-3 mb-6" id="symptom-options-container">
                         <!-- Injected JS -->
@@ -264,7 +285,7 @@ export const UI = {
         // Inject button via DOM
         const btn = document.createElement('button');
         btn.className = "w-full py-4 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press";
-        btn.innerText = "Salvar Registro";
+        btn.innerText = I18n.t("symptom.btn_save");
         btn.onclick = () => App.saveSymptoms(); // Assuming App is available globally or we use a callback
 
         div.querySelector('#symptoms-action-area').appendChild(btn);
@@ -279,6 +300,7 @@ export const UI = {
 
         UI.symptomOptions.forEach(opt => {
             const isActive = currentSymptoms.includes(opt.id);
+            const label = I18n.t(`symptom.${opt.id}`);
             const btn = document.createElement('button');
             btn.className = `p-4 rounded-xl border flex flex-col items-center gap-2 transition btn-press ${isActive ? 'bg-brand-50 border-brand-500 text-brand-600 dark:bg-brand-900/20 dark:border-brand-500/50' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'}`;
             btn.onclick = () => {
@@ -294,7 +316,7 @@ export const UI = {
             btn.setAttribute('data-id', opt.id);
             btn.innerHTML = `
                 <span class="text-2xl">${opt.icon}</span>
-                <span class="text-xs font-bold">${opt.label}</span>
+                <span class="text-xs font-bold">${label}</span>
             `;
             container.appendChild(btn);
         });
@@ -307,7 +329,8 @@ export const UI = {
         return symptoms.map(sId => {
             const opt = UI.symptomOptions.find(o => o.id === sId);
             if(!opt) return '';
-            return `<span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-600" title="${opt.label}">${opt.icon} ${opt.label}</span>`;
+            const label = I18n.t(`symptom.${opt.id}`);
+            return `<span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 dark:border-gray-600" title="${label}">${opt.icon} ${label}</span>`;
         }).join(' ');
     }
 };

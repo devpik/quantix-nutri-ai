@@ -100,18 +100,20 @@ export const Gamification = {
 
         const unlocked = p.achievements_unlocked || [];
 
+        // Rules are defined with IDs and translated names
         const rules = [
-            { id: 'first_step', icon: 'fa-shoe-prints', name: 'Primeiro Passo', check: () => meals.length >= 1 },
-            { id: 'water_master', icon: 'fa-tint', name: 'Hidratado', check: () => DB.getDayStats()[DB.getTodayKey()].water >= 2500 },
-            { id: 'streak_3', icon: 'fa-fire', name: 'Focado (3 Dias)', check: () => streak >= 3 },
-            { id: 'streak_7', icon: 'fa-fire-alt', name: 'Imparável (7 Dias)', check: () => streak >= 7 },
-            { id: 'expert', icon: 'fa-brain', name: 'Nutri Expert', check: () => meals.length >= 50 }
+            { id: 'first_step', icon: 'fa-shoe-prints', check: () => meals.length >= 1 },
+            { id: 'water_master', icon: 'fa-tint', check: () => DB.getDayStats()[DB.getTodayKey()].water >= 2500 },
+            { id: 'streak_3', icon: 'fa-fire', check: () => streak >= 3 },
+            { id: 'streak_7', icon: 'fa-fire-alt', check: () => streak >= 7 },
+            { id: 'expert', icon: 'fa-brain', check: () => meals.length >= 50 }
         ];
 
         rules.forEach(r => {
             if (r.check() && !unlocked.includes(r.id)) {
                 unlocked.push(r.id);
-                newBadges.push(r.name);
+                const badgeName = I18n.t(`badges.${r.id}`);
+                newBadges.push(badgeName);
                 Gamification.addXP(50);
             }
         });
@@ -178,24 +180,25 @@ export const Gamification = {
         if (badgeContainer) {
             badgeContainer.innerHTML = '';
             const allBadgesDef = [
-                { id: 'first_step', icon: 'fa-shoe-prints', name: 'Início' },
-                { id: 'water_master', icon: 'fa-tint', name: 'Hidratado' },
-                { id: 'streak_3', icon: 'fa-fire', name: 'Focado' },
-                { id: 'streak_7', icon: 'fa-fire-alt', name: 'Imparável' },
-                { id: 'expert', icon: 'fa-brain', name: 'Expert' }
+                { id: 'first_step', icon: 'fa-shoe-prints' },
+                { id: 'water_master', icon: 'fa-tint' },
+                { id: 'streak_3', icon: 'fa-fire' },
+                { id: 'streak_7', icon: 'fa-fire-alt' },
+                { id: 'expert', icon: 'fa-brain' }
             ];
 
             const unlocked = p.achievements_unlocked || [];
 
             allBadgesDef.forEach(b => {
                 const earned = unlocked.includes(b.id);
+                const name = I18n.t(`badges.${b.id}`);
                 const el = document.createElement('div');
                 el.className = `flex flex-col items-center min-w-[70px] p-2 rounded-2xl border ${earned ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20' : 'bg-gray-50 border-gray-100 grayscale opacity-40 dark:bg-gray-800'}`;
                 el.innerHTML = `
                     <div class="w-8 h-8 rounded-full ${earned ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-200 text-gray-400'} flex items-center justify-center mb-1">
                         <i class="fas ${b.icon}"></i>
                     </div>
-                    <span class="text-[9px] font-bold uppercase truncate w-full text-center">${b.name}</span>
+                    <span class="text-[9px] font-bold uppercase truncate w-full text-center">${name}</span>
                 `;
                 badgeContainer.appendChild(el);
             });
