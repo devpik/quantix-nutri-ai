@@ -172,7 +172,11 @@ export const Analytics = {
         const avgIntakeValEl = document.getElementById('avg-intake-val');
         if (avgIntakeValEl) {
              avgIntakeValEl.innerHTML = `${avgIntake} <span class="text-xs font-medium text-gray-400">kcal</span> ${Math.abs(diffTarget) > 50 ? trendIcon : ''}`;
-             document.getElementById('avg-intake-pct').innerText = `${intakePct}% da meta`;
+             const pctEl = document.getElementById('avg-intake-pct');
+             if(pctEl) {
+                 pctEl.innerText = `${intakePct}% da meta`;
+                 pctEl.style.marginTop = '4px'; // Fix alignment for avg-intake-pct
+             }
         }
 
         Analytics.drawChart('chart-intake', 'doughnut', {
@@ -316,7 +320,7 @@ export const Analytics = {
         Analytics.renderMetabolicHealth(p, meals, daysToRender);
 
         // =========================================================
-        // 5. NEW VISUALIZATIONS (REQUESTED)
+        // 5. NEW VISUALIZATIONS
         // =========================================================
 
         Analytics.renderMealDistribution(meals, p, daysToRender);
@@ -324,6 +328,12 @@ export const Analytics = {
         Analytics.renderQualityMatrix(meals, daysToRender);
         Analytics.renderTopOffenders(meals, daysToRender);
         Analytics.renderSymptomCorrelation(meals, daysToRender);
+
+        // New Charts Calls
+        Analytics.renderTopProtein(meals, daysToRender);
+        Analytics.renderTopCarbs(meals, daysToRender);
+        Analytics.renderTopFat(meals, daysToRender);
+        Analytics.renderTopSugar(meals, daysToRender);
     },
 
     renderHeatmap: (meals, p) => {
@@ -750,6 +760,131 @@ export const Analytics = {
             drillDown.appendChild(list);
             container.appendChild(drillDown);
         }
+    },
+
+    // New Functions
+    renderTopProtein: (meals, range) => {
+        const legend = "Alimentos que mais contribuem para sua ingestão de proteína.";
+        const canvasId = Analytics.getOrCreateContainer('chart-top-protein', 'Top 5 Fontes de Proteína', 'chart-symptoms', 'h-48', legend);
+        const dates = Analytics.getDatesInRange(range);
+        const dataMap = {};
+
+        meals.forEach(m => {
+            if (dates.includes(m.dateKey) && m.type === 'food' && m.macros?.p) {
+                const name = m.desc.split('(')[0].trim();
+                dataMap[name] = (dataMap[name] || 0) + m.macros.p;
+            }
+        });
+
+        const sorted = Object.entries(dataMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        Analytics.drawChart(canvasId, 'bar', {
+            labels: sorted.map(i => i[0]),
+            datasets: [{
+                label: 'Proteína (g)',
+                data: sorted.map(i => i[1]),
+                backgroundColor: '#3b82f6',
+                borderRadius: 4
+            }]
+        }, {
+            options: {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
+        });
+    },
+
+    renderTopCarbs: (meals, range) => {
+        const legend = "Alimentos que mais contribuem para sua ingestão de carboidratos.";
+        const canvasId = Analytics.getOrCreateContainer('chart-top-carbs', 'Top 5 Fontes de Carboidrato', 'chart-top-protein', 'h-48', legend);
+        const dates = Analytics.getDatesInRange(range);
+        const dataMap = {};
+
+        meals.forEach(m => {
+            if (dates.includes(m.dateKey) && m.type === 'food' && m.macros?.c) {
+                const name = m.desc.split('(')[0].trim();
+                dataMap[name] = (dataMap[name] || 0) + m.macros.c;
+            }
+        });
+
+        const sorted = Object.entries(dataMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        Analytics.drawChart(canvasId, 'bar', {
+            labels: sorted.map(i => i[0]),
+            datasets: [{
+                label: 'Carboidrato (g)',
+                data: sorted.map(i => i[1]),
+                backgroundColor: '#22c55e',
+                borderRadius: 4
+            }]
+        }, {
+            options: {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
+        });
+    },
+
+    renderTopFat: (meals, range) => {
+        const legend = "Alimentos que mais contribuem para sua ingestão de gordura.";
+        const canvasId = Analytics.getOrCreateContainer('chart-top-fat', 'Top 5 Fontes de Gordura', 'chart-top-carbs', 'h-48', legend);
+        const dates = Analytics.getDatesInRange(range);
+        const dataMap = {};
+
+        meals.forEach(m => {
+            if (dates.includes(m.dateKey) && m.type === 'food' && m.macros?.f) {
+                const name = m.desc.split('(')[0].trim();
+                dataMap[name] = (dataMap[name] || 0) + m.macros.f;
+            }
+        });
+
+        const sorted = Object.entries(dataMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        Analytics.drawChart(canvasId, 'bar', {
+            labels: sorted.map(i => i[0]),
+            datasets: [{
+                label: 'Gordura (g)',
+                data: sorted.map(i => i[1]),
+                backgroundColor: '#eab308',
+                borderRadius: 4
+            }]
+        }, {
+            options: {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
+        });
+    },
+
+    renderTopSugar: (meals, range) => {
+        const legend = "Alimentos que mais contribuem para sua ingestão de açúcar.";
+        const canvasId = Analytics.getOrCreateContainer('chart-top-sugar', 'Top 5 Fontes de Açúcar', 'chart-top-fat', 'h-48', legend);
+        const dates = Analytics.getDatesInRange(range);
+        const dataMap = {};
+
+        meals.forEach(m => {
+            if (dates.includes(m.dateKey) && m.type === 'food' && m.micros?.sugar) {
+                const name = m.desc.split('(')[0].trim();
+                dataMap[name] = (dataMap[name] || 0) + m.micros.sugar;
+            }
+        });
+
+        const sorted = Object.entries(dataMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        Analytics.drawChart(canvasId, 'bar', {
+            labels: sorted.map(i => i[0]),
+            datasets: [{
+                label: 'Açúcar (g)',
+                data: sorted.map(i => i[1]),
+                backgroundColor: '#f97316',
+                borderRadius: 4
+            }]
+        }, {
+            options: {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
+        });
     },
 
     drawChart: (id, type, data, extraOptions = {}) => {
