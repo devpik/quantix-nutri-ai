@@ -1,10 +1,11 @@
 import { DB } from '../data/database.js';
 import { API } from '../services/api.js';
+import { I18n } from '../services/i18n.js';
 
 export const Shopping = {
     generate: async () => {
         const plan = DB.getPlanner();
-        if (!plan) return alert("Gere um plano semanal primeiro!");
+        if (!plan) return alert(I18n.t("shopping.alert_no_plan"));
 
         const btn = document.querySelector('button[onclick="Shopping.generate()"]');
         if(btn) {
@@ -21,7 +22,7 @@ export const Shopping = {
             alert(e.message);
         } finally {
             if(btn) {
-                btn.innerHTML = '<i class="fas fa-shopping-cart mr-1"></i> Lista';
+                btn.innerHTML = `<i class="fas fa-shopping-cart mr-1"></i> ${I18n.t("planner.btn_list")}`;
                 btn.disabled = false;
             }
         }
@@ -33,7 +34,7 @@ export const Shopping = {
         if (!container) return;
 
         if (!list) {
-            container.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">Nenhuma lista gerada.</p>';
+            container.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">${I18n.t("shopping.empty")}</p>`;
             return;
         }
 
@@ -42,7 +43,7 @@ export const Shopping = {
         // Share Button
         html += `
             <button onclick="Shopping.share()" class="w-full mb-2 py-3 bg-green-500 text-white rounded-xl font-bold text-xs shadow-lg flex justify-center items-center gap-2">
-                <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
+                <i class="fab fa-whatsapp"></i> ${I18n.t("shopping.btn_share")}
             </button>
         `;
 
@@ -93,7 +94,7 @@ export const Shopping = {
         const list = DB.getShoppingList();
         if (!list) return;
 
-        let text = "*🛒 Lista de Compras - QuantixNutri*\n\n";
+        let text = I18n.t("shopping.share_header");
         list.forEach(cat => {
             text += `*${cat.category}*\n`;
             cat.items.forEach(item => {

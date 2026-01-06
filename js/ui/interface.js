@@ -1,3 +1,5 @@
+import { I18n } from '../services/i18n.js';
+
 // =========================================================================
 // 8. HELPERS
 // =========================================================================
@@ -9,7 +11,7 @@ export const Voice = {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             Voice.recognition = new SpeechRecognition();
-            Voice.recognition.lang = 'pt-BR';
+            Voice.recognition.lang = I18n.locale;
             Voice.recognition.continuous = false;
             Voice.recognition.interimResults = false;
 
@@ -45,6 +47,8 @@ export const Voice = {
 
     start: (id) => {
         if (!Voice.recognition) Voice.init();
+        else Voice.recognition.lang = I18n.locale; // Ensure lang update
+
         if (Voice.recognition) {
             Voice.targetId = id;
             Voice.recognition.start();

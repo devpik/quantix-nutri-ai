@@ -10,6 +10,7 @@ import { Context } from './services/context.js';
 import { Planner } from './ui/planner.js';
 import { Shopping } from './ui/shopping.js';
 import { Fasting } from './ui/fasting.js';
+import { I18n } from './services/i18n.js';
 
 // =========================================================================
 // 6. MAIN APP CONTROLLER
@@ -18,7 +19,13 @@ export const App = {
     reviewItems: [], // New state for multi-item review
 
     init: () => {
-        moment.locale('pt-br');
+        I18n.init(); // Initialize i18n
+
+        // Load moment locale
+        if (window.moment) {
+             window.moment.locale(I18n.locale === 'pt-BR' ? 'pt-br' : 'en');
+        }
+
         // Register PWA Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error", err));
@@ -69,7 +76,7 @@ export const App = {
         const profileImg = document.getElementById('header-profile-img');
         if (profileImg) {
             profileImg.onclick = () => {
-                if(confirm("Deseja atualizar o sistema?")) {
+                if(confirm(I18n.t("alert.update_confirm"))) {
                     window.location.reload(true);
                 }
             };
@@ -98,10 +105,10 @@ export const App = {
         const key = document.getElementById('inp-apikey').value;
         if (key && key.trim() !== "") {
             localStorage.setItem('quantix_ultimate_v2_api_key', key.trim());
-            alert("API Key salva com sucesso! O aplicativo será recarregado.");
+            alert(I18n.t("alert.api_saved"));
             location.reload();
         } else {
-            alert("Por favor, insira uma chave válida.");
+            alert(I18n.t("alert.api_invalid"));
         }
     },
 
@@ -113,7 +120,7 @@ export const App = {
         const age = document.getElementById('onb-age').value;
         const target = document.getElementById('onb-target').value;
 
-        if(!name || !w || !h || !age) return alert("Por favor, preencha todos os campos.");
+        if(!name || !w || !h || !age) return alert(I18n.t("alert.fill_all"));
 
         const p = DB.getProfile();
         p.name = name;
@@ -227,7 +234,7 @@ export const App = {
 
         const fastStatus = document.getElementById('fasting-state-text');
         if (stats.fastingStart) {
-            fastStatus.innerText = "ON";
+            fastStatus.innerText = I18n.t("tracker.fasting_on");
             fastStatus.className = "text-[10px] font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded animate-pulse";
             // Timer Logic
             const diff = Math.floor((Date.now() - stats.fastingStart) / 1000);
@@ -236,7 +243,7 @@ export const App = {
             const s = String(diff % 60).padStart(2, '0');
             document.getElementById('fasting-timer').innerText = `${h}:${m}:${s}`;
         } else {
-            fastStatus.innerText = "OFF";
+            fastStatus.innerText = I18n.t("tracker.fasting_off");
             fastStatus.className = "text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500";
             document.getElementById('fasting-timer').innerText = "--:--";
         }
@@ -246,7 +253,7 @@ export const App = {
         feed.innerHTML = '';
 
         if (meals.length === 0) {
-            feed.innerHTML = `<div class="text-center py-10 opacity-50"><i class="fas fa-utensils text-4xl text-gray-300 mb-2"></i><p class="text-xs text-gray-400">Seu diário está vazio hoje.</p></div>`;
+            feed.innerHTML = `<div class="text-center py-10 opacity-50"><i class="fas fa-utensils text-4xl text-gray-300 mb-2"></i><p class="text-xs text-gray-400">${I18n.t("tracker.empty_feed")}</p></div>`;
         } else {
              // Group meals
              const groups = {};
@@ -350,7 +357,7 @@ export const App = {
                 <div class="flex justify-between items-start mb-2 gap-2">
                     <input type="text" value="${item.desc}"
                         onchange="App.updateReviewItem(${index}, 'desc', this.value)"
-                        class="flex-1 bg-transparent font-bold text-sm text-gray-800 dark:text-white border-b border-dashed border-gray-300 dark:border-gray-600 focus:border-brand-500 outline-none pb-1" placeholder="Nome do item">
+                        class="flex-1 bg-transparent font-bold text-sm text-gray-800 dark:text-white border-b border-dashed border-gray-300 dark:border-gray-600 focus:border-brand-500 outline-none pb-1" placeholder="${I18n.t("modal.manual_name_placeholder")}">
 
                     <button onclick="App.removeReviewItem(${index})" class="text-gray-400 hover:text-red-500 p-1">
                         <i class="fas fa-times"></i>
@@ -424,13 +431,13 @@ export const App = {
     },
 
     confirmReview: () => {
-        if(App.reviewItems.length === 0) return alert("Adicione pelo menos um item.");
+        if(App.reviewItems.length === 0) return alert(I18n.t("alert.add_item_required"));
 
         // --- COMBOS LOGIC ---
         const chkCombo = document.getElementById('check-save-combo');
         if (chkCombo.checked) {
             const name = document.getElementById('inp-combo-name').value.trim();
-            if (!name) return alert("Por favor, dê um nome para o seu Combo.");
+            if (!name) return alert(I18n.t("alert.combo_name_required"));
 
             // Save Combo
             const combos = DB.getCombos();
@@ -510,7 +517,7 @@ export const App = {
         list.innerHTML = '';
 
         if (combos.length === 0) {
-            list.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">Você ainda não salvou nenhum combo.</p>';
+            list.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">${I18n.t("modal.combos_empty")}</p>`;
             return;
         }
 
@@ -577,11 +584,11 @@ export const App = {
         });
 
         Modal.close('add-food');
-        alert(`Combo "${combo.name}" adicionado em ${Input.cat}!\n${xpRes.message} (+${xpRes.xp} XP)`);
+        alert(I18n.t("alert.combo_added", { name: combo.name, category: Input.cat }) + `\n${xpRes.message} (+${xpRes.xp} XP)`);
     },
 
     deleteCombo: (id) => {
-        if(!confirm("Excluir este combo?")) return;
+        if(!confirm(I18n.t("alert.delete_combo_confirm"))) return;
         const combos = DB.getCombos().filter(c => c.id !== id);
         DB.set('combos', combos);
         App.renderCombosList();
@@ -598,12 +605,12 @@ export const App = {
         const p = DB.getProfile();
         if (!p.notificationsEnabled) {
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') return alert("Permissão de notificação negada.");
+            if (permission !== 'granted') return alert(I18n.t("alert.permission_denied"));
         }
         p.notificationsEnabled = !p.notificationsEnabled;
         DB.set('profile', p);
         Profile.loadToUI();
-        if(p.notificationsEnabled) new Notification("QuantixNutri", { body: "Lembretes ativados com sucesso!" });
+        if(p.notificationsEnabled) new Notification("QuantixNutri", { body: I18n.t("alert.reminders_enabled") });
     },
 
     scheduleReminders: () => {
@@ -634,7 +641,7 @@ export const App = {
     },
 
     resetApiUsage: () => {
-        if(!confirm("Zerar estatísticas de uso da API?")) return;
+        if(!confirm(I18n.t("alert.reset_api_confirm"))) return;
         const p = DB.getProfile();
         p.apiUsage = { totalTokens: 0, totalRequests: 0 };
         DB.set('profile', p);
@@ -659,7 +666,7 @@ export const App = {
     toggleFasting: () => {
         const stats = DB.getDayStats(); const today = DB.getTodayKey();
         if (stats[today].fastingStart) {
-            if(confirm("Encerrar jejum agora?")) {
+            if(confirm(I18n.t("alert.end_fasting_confirm"))) {
                 // Calculate duration and add to today's minutes
                 const durationMinutes = (Date.now() - stats[today].fastingStart) / 1000 / 60;
                 stats[today].fastingMinutes = (stats[today].fastingMinutes || 0) + durationMinutes;
@@ -759,7 +766,7 @@ export const App = {
         delBtn.innerHTML = "<i class='fas fa-times'></i>";
         delBtn.onclick = (e) => {
             e.stopPropagation();
-            if(confirm('Apagar item?')) App.deleteMeal(m.id);
+            if(confirm(I18n.t("alert.delete_item_confirm"))) App.deleteMeal(m.id);
         };
         rightCol.appendChild(delBtn);
 
@@ -834,7 +841,7 @@ export const App = {
     addManual: () => {
         const desc = document.getElementById('man-desc').value;
         const cals = parseInt(document.getElementById('man-cals').value);
-        if (!desc || isNaN(cals)) return alert("Preencha nome e calorias.");
+        if (!desc || isNaN(cals)) return alert(I18n.t("alert.manual_validation"));
 
         const data = {
             desc, cals,
@@ -860,7 +867,7 @@ export const App = {
     addExercise: () => {
         const desc = document.getElementById('exe-desc').value;
         const cals = parseInt(document.getElementById('exe-cals').value);
-        if (!desc || isNaN(cals)) return alert("Dados inválidos");
+        if (!desc || isNaN(cals)) return alert(I18n.t("alert.exercise_validation"));
 
         const data = {
             desc, cals,
@@ -916,7 +923,7 @@ export const App = {
                 App.refreshUI();
                 // Feedback
                 setTimeout(() => {
-                    alert("Sintomas registrados!");
+                    alert(I18n.t("alert.symptoms_saved"));
                 }, 100);
             }
         }
@@ -938,12 +945,12 @@ export const App = {
                 const d = JSON.parse(e.target.result);
                 Object.keys(d).forEach(k => { if(k.startsWith(CONFIG.dbPrefix)) localStorage.setItem(k, d[k]); });
                 location.reload();
-            } catch(err) { alert("Arquivo inválido"); }
+            } catch(err) { alert(I18n.t("alert.invalid_file")); }
         };
         r.readAsText(file);
     },
     resetAll: () => {
-        if(confirm("Tem certeza que deseja apagar todos os dados?")) { localStorage.clear(); location.reload(); }
+        if(confirm(I18n.t("alert.reset_all_confirm"))) { localStorage.clear(); location.reload(); }
     }
 };
 
@@ -960,6 +967,7 @@ window.Context = Context;
 window.Planner = Planner;
 window.Shopping = Shopping;
 window.Fasting = Fasting;
+window.I18n = I18n; // Ensure it's available
 
 // Ensure init is called correctly handling module timing
 if (document.readyState === 'complete' || document.readyState === 'interactive') {

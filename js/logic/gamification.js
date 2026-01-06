@@ -1,4 +1,5 @@
 import { DB } from '../data/database.js';
+import { I18n } from '../services/i18n.js';
 
 // =========================================================================
 // 3. GAMIFICATION ENGINE (RPG LOGIC)
@@ -17,15 +18,15 @@ export const Gamification = {
         switch (actionType) {
             case 'meal_entry':
                 xp = 50;
-                message = "Refeição registrada!";
+                message = I18n.t("gamification.meal_bonus");
                 break;
             case 'combo_entry':
                 xp = 100;
-                message = "Combo registrado!";
+                message = I18n.t("gamification.combo_bonus");
                 break;
             case 'daily_streak':
                 xp = 100; // Bonus for keeping streak
-                message = "Sequência mantida!";
+                message = I18n.t("gamification.streak_bonus");
                 break;
             default:
                 xp = 0;
@@ -34,7 +35,7 @@ export const Gamification = {
         // Bonus: Colorful Plate (Detected > 3 items in a single analysis/entry)
         if (metadata.itemCount && metadata.itemCount >= 3) {
             xp += 30;
-            message += " + Bônus Prato Colorido! 🥗";
+            message += I18n.t("gamification.colorful_bonus");
         }
 
         return { xp, message };
@@ -45,42 +46,11 @@ export const Gamification = {
         const oldLevel = p.level;
         p.xp += amount;
 
-        // Check Level Up
-        // Current logic: We accumulate total XP.
-        // We need to calculate if current XP > required for next level.
-        // Let's assume cumulative XP.
-        // Level 1: 0-500. Level 2: 500-1000 (diff 500? or Level*500 means 2*500=1000 for next?)
-        // Interpretation: XP to reach Level N+1 = N * 500.
-        // This usually means "XP needed for NEXT level".
-        // If I am Level 1, I need 1*500 = 500 XP to reach Level 2.
-        // If I am Level 2, I need 2*500 = 1000 XP (total 1500) or just 1000 delta?
-        // Let's stick to a simple threshold: Threshold = Level * 500.
-        // If p.xp >= (p.level * 500), Level Up.
-
         let nextLevelThreshold = p.level * 500;
 
         if (p.xp >= nextLevelThreshold) {
             p.level++;
             p.credits += 5; // Reward
-            p.xp = p.xp - nextLevelThreshold; // Optional: Reset XP or Keep Accumulating?
-            // "xp_total" suggests accumulating. But visual bars usually reset.
-            // Let's Keep Accumulating for "Total XP" but the threshold increases.
-            // Wait, if I keep accumulating, then at Level 2 (Total 500), I need 1000 Total to reach Level 3?
-            // "Level * 500" as delta or total?
-            // Standard RPG: XP Curve.
-            // Let's implementation: XP resets on level up (visual bar 0-100%) OR XP is total and we calculate thresholds.
-            // Requirement says "XP_Next_Level = Level * 500".
-            // Let's assume this is the Delta.
-            // So I subtract the threshold from current XP, or I verify against total.
-            // Simpler for this PWA: XP resets visual, but maybe we keep a "total_lifetime_xp" hidden if we wanted.
-            // The request says "xp_total: Integer".
-            // Let's assume we keep accumulating.
-            // Level 1 -> 2 requires 500. Total 500.
-            // Level 2 -> 3 requires 1000. Total 1500.
-            // Formula for Total XP for Level L: 500 * L*(L-1)/2 ? No, that's complex.
-            // Let's go with: p.xp is the progress to next level. When it hits target, level++, xp = 0.
-            // That's easiest for "Barra de progresso visual (XP atual / XP próximo nível)".
-
             p.xp = 0; // Reset for next level progress
             Gamification.triggerLevelUp(p.level);
         }
@@ -91,7 +61,7 @@ export const Gamification = {
 
     triggerLevelUp: (newLevel) => {
         Gamification.triggerConfetti();
-        alert(`🎉 LEVEL UP! Você subiu para o Nível ${newLevel}!\nGanhou +5 Créditos IA.`);
+        alert(I18n.t("gamification.level_up", { level: newLevel }));
     },
 
     checkStreak: () => {
@@ -107,11 +77,7 @@ export const Gamification = {
             p.streak_days++;
             // Bonus for streak extension
             const { xp, message } = Gamification.calculateTransactionXP('daily_streak');
-            // We verify if we should add this XP directly (handled inside addXP normally)
-            // But we don't want to alert every time.
-            p.xp += xp; // Add manually to avoid alert spam or use addXP silent?
-            // Let's use addXP but maybe silence it? For now, standard addXP is fine.
-            // Actually, let's just increment and save.
+            p.xp += xp;
         } else {
             // Broken streak (unless it's the very first use)
             if (lastActivityDate) {
@@ -131,11 +97,6 @@ export const Gamification = {
         const meals = DB.getMeals();
         const streak = p.streak_days;
         const newBadges = [];
-
-        // Mapping 'badges' to 'achievements_unlocked'
-        // We will maintain p.achievements_unlocked as the source of truth
-        // But for compatibility with existing UI that uses p.badges, we might ensure they are synced or UI updated.
-        // Existing UI in gamification.js uses p.badges. I will update it to use achievements_unlocked.
 
         const unlocked = p.achievements_unlocked || [];
 
@@ -160,7 +121,7 @@ export const Gamification = {
             p.badges = unlocked; // Sync for legacy if any
             DB.set('profile', p);
             Gamification.triggerConfetti();
-            alert(`🏆 Novas Conquistas: ${newBadges.join(', ')}`);
+            alert(I18n.t("gamification.new_badges", { badges: newBadges.join(', ') }));
             Gamification.updateUI();
         }
     },
@@ -169,20 +130,6 @@ export const Gamification = {
         const p = DB.getProfile();
 
         // --- 1. Header Profile Image & Streak Glow ---
-        const headerContainer = document.querySelector('.header-profile-container') || document.getElementById('header-username').parentNode;
-
-        // Check if we already injected the structure. If not, do it.
-        // Existing structure in index.html (inferred):
-        // <div> <h1 id="header-username">...</h1> <p id="profile-subtitle">...</p> </div>
-        // We want to add the image to the left.
-
-        // I will rely on finding elements by ID and modifying them.
-        // Since I cannot rewrite index.html easily to change structure without reading it,
-        // I will just update the elements I know exist or add classes.
-
-        // However, the request asks for "Header dinâmico que exiba: Foto circular com borda iluminada se o streak estiver ativo".
-        // I'll assume I can manipulate the DOM here.
-
         const profileImg = document.getElementById('header-profile-img');
         if (profileImg) {
             if (p.profile_image_url) {
@@ -202,7 +149,7 @@ export const Gamification = {
 
         // --- 2. XP Bar & Level ---
         const elLvl = document.getElementById('user-level-badge');
-        if(elLvl) elLvl.innerText = `LVL ${p.level}`;
+        if(elLvl) elLvl.innerText = `${I18n.t('header.level_badge')} ${p.level}`;
 
         const elSub = document.getElementById('profile-subtitle');
         if(elSub) elSub.innerText = `Nível ${p.level} • ${p.xp} / ${Gamification.getNextLevelXP(p.level)} XP`;
@@ -262,10 +209,6 @@ export const Gamification = {
             origin: { y: 0.7 },
             zIndex: 9999
         };
-
-        // We can inject a script tag for canvas-confetti if not present, or use a simple CSS fallback.
-        // For reliability in this environment without external script loading guarantees,
-        // I will create a simple DOM-based confetti.
 
         const container = document.createElement('div');
         container.style.position = 'fixed';

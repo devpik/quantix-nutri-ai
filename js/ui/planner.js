@@ -3,6 +3,7 @@ import { API } from '../services/api.js';
 import { App } from '../app.js';
 import { Shopping } from './shopping.js';
 import { Modal } from './interface.js';
+import { I18n } from '../services/i18n.js';
 
 export const Planner = {
     init: () => {
@@ -19,13 +20,13 @@ export const Planner = {
         // Header / Actions
         let html = `
             <div class="flex justify-between items-center mb-4 px-2">
-                <h3 class="text-xs font-bold text-gray-500 uppercase">Planejamento Semanal IA</h3>
+                <h3 class="text-xs font-bold text-gray-500 uppercase">${I18n.t("planner.title")}</h3>
                 <div class="flex gap-2">
                     ${plan ? `<button onclick="Shopping.generate()" class="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition">
-                        <i class="fas fa-shopping-cart mr-1"></i> Lista
+                        <i class="fas fa-shopping-cart mr-1"></i> ${I18n.t("planner.btn_list")}
                     </button>` : ''}
                     <button onclick="Planner.generate()" class="text-[10px] font-bold bg-brand-100 text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-200 transition flex items-center gap-1">
-                        <i class="fas fa-magic"></i> ${plan ? 'Regerar' : 'Gerar Semana'}
+                        <i class="fas fa-magic"></i> ${plan ? I18n.t("planner.btn_regenerate") : I18n.t("planner.btn_generate")}
                     </button>
                 </div>
             </div>
@@ -37,8 +38,8 @@ export const Planner = {
                     <div class="w-16 h-16 bg-brand-50 dark:bg-brand-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-500">
                         <i class="fas fa-calendar-alt text-2xl"></i>
                     </div>
-                    <h4 class="text-sm font-bold text-gray-800 dark:text-white mb-1">Nenhum plano ativo</h4>
-                    <p class="text-xs text-gray-400 mb-4 max-w-[200px] mx-auto">Use a IA para criar um cardápio completo baseado na sua meta.</p>
+                    <h4 class="text-sm font-bold text-gray-800 dark:text-white mb-1">${I18n.t("planner.empty_title")}</h4>
+                    <p class="text-xs text-gray-400 mb-4 max-w-[200px] mx-auto">${I18n.t("planner.empty_desc")}</p>
                 </div>
             `;
             container.innerHTML = html;
@@ -85,13 +86,13 @@ export const Planner = {
                         <span class="text-[10px] font-bold text-gray-400">~${meal.estimated_cals} kcal</span>
                         <div class="flex gap-2">
                             <button onclick="Planner.simplify('${descSafe}', ${meal.estimated_cals}, ${dayIndex}, '${mealKey}')"
-                                title="Simplificar (Dia Corrido)"
+                                title="${I18n.t("planner.simplify")}"
                                 class="text-[10px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded hover:bg-yellow-200 transition">
                                 <i class="fas fa-bolt"></i>
                             </button>
                             <button onclick="Planner.logMeal('${descSafe}', ${meal.estimated_cals}, '${label}')"
                                 class="text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded hover:bg-brand-500 hover:text-white transition">
-                                Comi isso
+                                ${I18n.t("planner.log_meal")}
                             </button>
                         </div>
                     </div>
@@ -103,7 +104,7 @@ export const Planner = {
     simplify: async (desc, cals, dayIndex, mealKey) => {
         const descEl = document.getElementById(`desc-${dayIndex}-${mealKey}`);
         if(descEl) {
-             descEl.innerHTML = '<span class="animate-pulse"><i class="fas fa-spinner fa-spin mr-1"></i> Simplificando...</span>';
+             descEl.innerHTML = `<span class="animate-pulse"><i class="fas fa-spinner fa-spin mr-1"></i> ${I18n.t("planner.simplifying")}</span>`;
         }
 
         try {
@@ -140,7 +141,7 @@ export const Planner = {
         const container = document.getElementById('planner-container');
         container.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-brand-500 animate-pulse">
             <i class="fas fa-magic text-4xl mb-4"></i>
-            <p class="text-xs font-bold">Criando sua semana perfeita...</p>
+            <p class="text-xs font-bold">${I18n.t("planner.creating")}</p>
         </div>`;
 
         try {
