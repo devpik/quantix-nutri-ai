@@ -244,7 +244,7 @@ export const App = {
         document.getElementById('hero-cals-left').innerText = Math.round(remaining);
         document.getElementById('hero-target').innerText = p.target;
 
-        App.updateMacroChart(sum.p, sum.c, sum.f);
+        App.updateMacroChart(Math.round(sum.p), Math.round(sum.c), Math.round(sum.f));
 
         // Color Logic for Remaining
         const elRem = document.getElementById('hero-cals-left');
@@ -257,9 +257,9 @@ export const App = {
             document.getElementById(`bar-macro-${id}`).style.width = `${pct}%`;
             document.getElementById(`lbl-macro-${id}`).innerText = `${val}/${max}g`;
         };
-        updateBar('p', sum.p, goals.p);
-        updateBar('c', sum.c, goals.c);
-        updateBar('f', sum.f, goals.f);
+        updateBar('p', Math.round(sum.p), goals.p);
+        updateBar('c', Math.round(sum.c), goals.c);
+        updateBar('f', Math.round(sum.f), goals.f);
 
         // 3. Water & Fasting
         document.getElementById('water-val').innerText = stats.water + 'ml';
@@ -787,7 +787,7 @@ export const App = {
             <div class="flex flex-col items-end gap-1">
                 <div class="text-right">
                     <span class="block text-xs font-black ${isEx ? 'text-blue-500' : 'text-gray-800 dark:text-white'}">${isEx ? '-' : '+'}${m.cals}</span>
-                    ${!isEx ? `<span class="text-[8px] text-gray-400">P:${m.macros.p} C:${m.macros.c} G:${m.macros.f}</span>` : ''}
+                    ${!isEx ? `<span class="text-[8px] text-gray-400">P:${Math.round(m.macros.p)} C:${Math.round(m.macros.c)} G:${Math.round(m.macros.f)}</span>` : ''}
                 </div>
                 <div id="action-container-${m.id}"></div>
             </div>
