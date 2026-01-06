@@ -47,12 +47,33 @@ export const App = {
 
         // Render Quick Adds (Offline DB)
         const quickContainer = document.getElementById('quick-add-container');
+        // Translate key map for offline DB
+        const offlineMap = {
+             "Café Preto (Sem Açúcar)": "coffee_black",
+             "Pão Francês (1 un)": "bread",
+             "Ovo Cozido": "egg",
+             "Tapioca com Manteiga": "tapioca",
+             "Banana Prata": "banana",
+             "Arroz Branco (100g)": "rice",
+             "Feijão Carioca (100g)": "beans",
+             "Filé de Frango Grelhado (100g)": "chicken",
+             "Whey Protein (Dose)": "whey",
+             "Salada de Alface/Tomate": "salad"
+        };
+
         OFFLINE_FOOD_DB.forEach(item => {
             const btn = document.createElement('button');
             btn.className = "flex-shrink-0 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-[10px] font-bold shadow-sm hover:border-brand-500 transition text-left";
-            btn.innerHTML = `<span class="block text-gray-800 dark:text-gray-200">${item.desc}</span><span class="text-xs text-brand-500">${item.cals} kcal</span>`;
+
+            // Translate description if possible
+            const transKey = offlineMap[item.desc];
+            const displayDesc = transKey ? I18n.t(`food.${transKey}`) : item.desc;
+
+            btn.innerHTML = `<span class="block text-gray-800 dark:text-gray-200">${displayDesc}</span><span class="text-xs text-brand-500">${item.cals} kcal</span>`;
             btn.onclick = () => {
-                App.addMealToDB({ ...item, type: 'food', category: Input.cat, timestamp: Date.now(), macros: {p: item.p, c: item.c, f: item.f, fib: item.fib} });
+                // When adding, use the localized description?
+                // It's better to store what the user saw.
+                App.addMealToDB({ ...item, desc: displayDesc, type: 'food', category: Input.cat, timestamp: Date.now(), macros: {p: item.p, c: item.c, f: item.f, fib: item.fib} });
                 Modal.close('add-food');
             };
             quickContainer.appendChild(btn);
@@ -733,6 +754,9 @@ export const App = {
             scoreBadge = `<span class="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded border ${scoreColor} dark:bg-opacity-10 dark:border-opacity-10">Score: ${m.score}</span>`;
         }
 
+        // Category Label
+        const categoryLabel = isEx ? I18n.t('cat.exercise') : UI.getCategoryLabel(m.category);
+
         const el = document.createElement('div');
         // Indentation and styling for Child vs Parent/Single
         if (isChild) {
@@ -754,7 +778,7 @@ export const App = {
                         ${badges}
                     </h4>
                     <p class="text-[9px] text-gray-400 font-bold flex items-center gap-2 flex-wrap mt-0.5">
-                        ${m.category || 'Atividade'} • ${time}
+                        ${categoryLabel} • ${time}
                         ${scoreBadge}
                     </p>
                     ${symptomTags ? `<div class="mt-1 flex flex-wrap gap-1">${symptomTags}</div>` : ''}
@@ -790,7 +814,7 @@ export const App = {
             if (actionContainer) {
                 const symBtn = document.createElement('button');
                 symBtn.className = "text-[10px] text-gray-400 hover:text-brand-500 font-bold flex items-center gap-1 px-1.5 py-0.5 rounded border border-transparent hover:border-brand-200 hover:bg-brand-50 transition";
-                symBtn.innerHTML = `<i class="far fa-smile"></i> ${m.symptoms && m.symptoms.length > 0 ? 'Editar' : 'Sentiu?'}`;
+                symBtn.innerHTML = `<i class="far fa-smile"></i> ${m.symptoms && m.symptoms.length > 0 ? I18n.t("symptom.edit") : I18n.t("symptom.felt")}`;
                 symBtn.onclick = (e) => {
                      e.stopPropagation();
                      App.openSymptoms(m.id);
@@ -807,7 +831,8 @@ export const App = {
         group.items.forEach(i => totalCals += i.cals);
 
         const time = moment(group.time).format('HH:mm');
-        const title = group.name || `${group.cat} • ${time}`;
+        const catLabel = UI.getCategoryLabel(group.cat);
+        const title = group.name || `${catLabel} • ${time}`;
 
         const el = document.createElement('div');
         el.className = "bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700 animate-slide-up mb-3 overflow-hidden";

@@ -2,7 +2,7 @@ import { DB } from '../data/database.js';
 import { API } from '../services/api.js';
 import { App } from '../app.js';
 import { Shopping } from './shopping.js';
-import { Modal } from './interface.js';
+import { Modal, UI } from './interface.js';
 import { I18n } from '../services/i18n.js';
 
 export const Planner = {
@@ -57,10 +57,10 @@ export const Planner = {
                     </div>
 
                     <div id="content-day-${index}" class="hidden p-4 space-y-4 border-t border-gray-100 dark:border-gray-700">
-                        ${Planner.renderMealRow(day.meals.breakfast, 'Café da Manhã', 'coffee', index, 'breakfast')}
-                        ${Planner.renderMealRow(day.meals.lunch, 'Almoço', 'utensils', index, 'lunch')}
-                        ${Planner.renderMealRow(day.meals.snack, 'Lanche', 'apple-alt', index, 'snack')}
-                        ${Planner.renderMealRow(day.meals.dinner, 'Jantar', 'moon', index, 'dinner')}
+                        ${Planner.renderMealRow(day.meals.breakfast, UI.getCategoryLabel('Café da Manhã'), 'coffee', index, 'breakfast')}
+                        ${Planner.renderMealRow(day.meals.lunch, UI.getCategoryLabel('Almoço'), 'utensils', index, 'lunch')}
+                        ${Planner.renderMealRow(day.meals.snack, UI.getCategoryLabel('Lanche'), 'apple-alt', index, 'snack')}
+                        ${Planner.renderMealRow(day.meals.dinner, UI.getCategoryLabel('Jantar'), 'moon', index, 'dinner')}
                     </div>
                 </div>
             `;
@@ -163,7 +163,7 @@ export const Planner = {
         // Switch to Manual Mode
         setTimeout(() => {
             Input.setMode('manual');
-            Input.setCat(category);
+            Input.setCat(category); // Need to make sure Input.setCat handles translated labels correctly if passed
 
             document.getElementById('man-desc').value = desc;
             document.getElementById('man-cals').value = cals;
