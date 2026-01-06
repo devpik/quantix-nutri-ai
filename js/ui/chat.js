@@ -1,6 +1,7 @@
 import { API } from '../services/api.js';
 import { Analytics } from './analytics.js';
 import { Voice } from './interface.js';
+import { I18n } from '../services/i18n.js';
 
 export const ChatUI = {
     isOpen: false,
@@ -178,7 +179,7 @@ export const ChatUI = {
         if (!badge) return;
 
         const days = Analytics.currentRange || 1;
-        const text = days === 1 ? "Hoje" : `Últimos ${days} Dias`;
+        const text = days === 1 ? I18n.t("analytics.range_1") : `${days} ${I18n.t("analytics.range_1").split(' ')[1] || 'Dias'}`;
         badge.innerText = `Analisando: ${text}`;
     },
 

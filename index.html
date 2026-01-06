@@ -111,35 +111,35 @@
                 <i class="fas fa-leaf text-4xl"></i>
             </div>
             <h1 class="text-2xl font-black text-gray-800 dark:text-white mb-2">Quantix<span class="text-brand-500">AI</span></h1>
-            <p class="text-gray-400 text-sm mb-8">Antes de começar, precisamos configurar seu perfil para a IA funcionar corretamente.</p>
+            <p class="text-gray-400 text-sm mb-8" data-i18n="onboarding.subtitle">Antes de começar, precisamos configurar seu perfil para a IA funcionar corretamente.</p>
 
             <div class="space-y-4 text-left">
                  <div class="bg-gray-50 dark:bg-dark-card p-4 rounded-2xl border border-gray-100 dark:border-dark-border">
-                    <label class="text-xs font-bold text-gray-400 uppercase">Seu Nome</label>
-                    <input type="text" id="onb-name" class="w-full bg-transparent text-lg font-bold text-gray-800 dark:text-white mt-1 outline-none" placeholder="Digite seu nome">
+                    <label class="text-xs font-bold text-gray-400 uppercase" data-i18n="onboarding.name">Seu Nome</label>
+                    <input type="text" id="onb-name" class="w-full bg-transparent text-lg font-bold text-gray-800 dark:text-white mt-1 outline-none" data-i18n="onboarding.name_placeholder" placeholder="Digite seu nome">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="bg-gray-50 dark:bg-dark-card p-3 rounded-2xl border border-gray-100 dark:border-dark-border">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Peso (kg)</label>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="onboarding.weight">Peso (kg)</label>
                         <input type="number" id="onb-weight" class="w-full bg-transparent text-lg font-bold outline-none" placeholder="00.0">
                     </div>
                     <div class="bg-gray-50 dark:bg-dark-card p-3 rounded-2xl border border-gray-100 dark:border-dark-border">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Altura (cm)</label>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="onboarding.height">Altura (cm)</label>
                         <input type="number" id="onb-height" class="w-full bg-transparent text-lg font-bold outline-none" placeholder="170">
                     </div>
                     <div class="bg-gray-50 dark:bg-dark-card p-3 rounded-2xl border border-gray-100 dark:border-dark-border">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Idade</label>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="onboarding.age">Idade</label>
                         <input type="number" id="onb-age" class="w-full bg-transparent text-lg font-bold outline-none" placeholder="25">
                     </div>
                      <div class="bg-gray-50 dark:bg-dark-card p-3 rounded-2xl border border-gray-100 dark:border-dark-border">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Meta (Kcal)</label>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="onboarding.target">Meta (Kcal)</label>
                         <input type="number" id="onb-target" class="w-full bg-transparent text-lg font-bold outline-none" placeholder="2000" value="2000">
                     </div>
                 </div>
             </div>
 
-            <button onclick="App.finishOnboarding()" class="w-full mt-8 py-4 bg-gray-900 dark:bg-white dark:text-black text-white rounded-xl font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform">
+            <button onclick="App.finishOnboarding()" class="w-full mt-8 py-4 bg-gray-900 dark:bg-white dark:text-black text-white rounded-xl font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform" data-i18n="onboarding.start_btn">
                 Começar Jornada
             </button>
         </div>
@@ -165,7 +165,7 @@
                 </div>
             </div>
             <div class="absolute bottom-4 left-0 w-full text-center">
-                <span class="bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur">IA Detectando...</span>
+                <span class="bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur" data-i18n="app.loading_ai">IA Detectando...</span>
             </div>
         </div>
 
@@ -188,13 +188,13 @@
             <div class="flex items-center gap-3">
                 <div class="flex flex-col items-center">
                     <div class="relative header-profile-container group">
-                        <img id="header-profile-img" src="" onclick="location.reload()" title="Clique para atualizar o sistema" class="w-9 h-9 rounded-full object-cover bg-gray-200 border border-brand-500 cursor-pointer hover:opacity-90 transition" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                        <img id="header-profile-img" src="" onclick="location.reload()" title="Clique para atualizar o sistema" data-i18n="header.profile_title" class="w-9 h-9 rounded-full object-cover bg-gray-200 border border-brand-500 cursor-pointer hover:opacity-90 transition" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=random'">
                         <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center border border-white dark:border-dark-card shadow-sm z-20 animate-pulse pointer-events-none">
                             <i class="fas fa-sync-alt text-white text-[8px]"></i>
                         </div>
                         <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-bold px-1 rounded-full border border-white text-yellow-900 shadow-sm z-10" id="user-level-badge">LVL 1</div>
                     </div>
-                    <span class="text-[8px] text-gray-400 mt-0.5 cursor-pointer hover:text-brand-500 transition" onclick="location.reload()">Clique p/ atualizar</span>
+                    <span class="text-[8px] text-gray-400 mt-0.5 cursor-pointer hover:text-brand-500 transition" onclick="location.reload()" data-i18n="header.click_update">Clique p/ atualizar</span>
                 </div>
                 <div>
                     <h1 class="font-bold text-sm text-gray-800 dark:text-white leading-tight" id="header-username">Quantix<span class="text-brand-500">AI</span></h1>
@@ -236,17 +236,17 @@
                             <canvas id="chart-macros-today"></canvas>
                         </div>
                         <div class="flex-1">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saldo Disponível</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest" data-i18n="tracker.hero_available">Saldo Disponível</span>
                             <div class="flex items-center gap-1">
                                 <span id="hero-cals-left" class="text-3xl font-black text-gray-800 dark:text-white tracking-tighter">0</span>
                                 <span class="text-xs font-medium text-gray-400">kcal</span>
                             </div>
-                            <p class="text-[9px] text-gray-400 mt-1">Meta: <span id="hero-target">2000</span></p>
+                            <p class="text-[9px] text-gray-400 mt-1"><span data-i18n="tracker.hero_goal">Meta:</span> <span id="hero-target">2000</span></p>
                             <button onclick="App.suggestMeal()" class="mt-2 text-[9px] font-bold bg-brand-100 text-brand-700 px-2 py-1 rounded-lg border border-brand-200 hover:bg-brand-200 transition flex items-center gap-1">
-                                <i class="fas fa-lightbulb"></i> O que comer agora?
+                                <i class="fas fa-lightbulb"></i> <span data-i18n="tracker.btn_suggest">O que comer agora?</span>
                             </button>
                             <button onclick="Modal.open('fridge')" class="mt-1 text-[9px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-lg border border-blue-200 hover:bg-blue-200 transition flex items-center gap-1">
-                                <i class="fas fa-refrigerator"></i> Limpa Geladeira
+                                <i class="fas fa-refrigerator"></i> <span data-i18n="tracker.btn_fridge">Limpa Geladeira</span>
                             </button>
                         </div>
                     </div>
@@ -255,7 +255,7 @@
                     <div class="space-y-3">
                         <div>
                             <div class="flex justify-between text-[10px] font-bold mb-1">
-                                <span class="text-blue-500">Proteína</span>
+                                <span class="text-blue-500" data-i18n="tracker.macro_p">Proteína</span>
                                 <span id="lbl-macro-p" class="text-gray-500 dark:text-gray-400">0 / 0g</span>
                             </div>
                             <div class="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -264,7 +264,7 @@
                         </div>
                         <div>
                             <div class="flex justify-between text-[10px] font-bold mb-1">
-                                <span class="text-green-500">Carboidrato</span>
+                                <span class="text-green-500" data-i18n="tracker.macro_c">Carboidrato</span>
                                 <span id="lbl-macro-c" class="text-gray-500 dark:text-gray-400">0 / 0g</span>
                             </div>
                             <div class="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -273,7 +273,7 @@
                         </div>
                         <div>
                             <div class="flex justify-between text-[10px] font-bold mb-1">
-                                <span class="text-yellow-500">Gordura</span>
+                                <span class="text-yellow-500" data-i18n="tracker.macro_f">Gordura</span>
                                 <span id="lbl-macro-f" class="text-gray-500 dark:text-gray-400">0 / 0g</span>
                             </div>
                             <div class="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -300,7 +300,7 @@
 
                             <div class="flex justify-between items-end mt-2">
                                 <div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Hidratação</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="tracker.water_title">Hidratação</p>
                                     <div class="w-20 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-1 overflow-hidden">
                                         <div id="water-bar-mini" class="h-full bg-blue-500 w-0"></div>
                                     </div>
@@ -322,7 +322,7 @@
                                     <i class="fas fa-stopwatch text-xs"></i>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <span id="fasting-state-text" class="text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500">OFF</span>
+                                    <span id="fasting-state-text" class="text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500" data-i18n="tracker.fasting_off">OFF</span>
                                     <button id="btn-edit-fasting" onclick="Fasting.openEdit()" class="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-brand-500 flex items-center justify-center transition">
                                         <i class="fas fa-pen text-[9px]"></i>
                                     </button>
@@ -331,7 +331,7 @@
                             <div class="mt-1 cursor-pointer" onclick="App.toggleFasting()">
                                 <span id="fasting-timer" class="text-lg font-mono font-bold text-gray-800 dark:text-white tracking-tight">--:--</span>
                             </div>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">Jejum Intermitente</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1" data-i18n="tracker.fasting_title">Jejum Intermitente</p>
                         </div>
                     </div>
                 </div>
@@ -339,9 +339,9 @@
                 <!-- Feed Section -->
                 <div>
                     <div class="flex justify-between items-end mb-4 px-1">
-                        <h3 class="font-bold text-gray-800 dark:text-gray-100">Linha do Tempo</h3>
+                        <h3 class="font-bold text-gray-800 dark:text-gray-100" data-i18n="tracker.timeline_title">Linha do Tempo</h3>
                         <button onclick="Modal.open('add-food')" class="text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/20 px-3 py-1.5 rounded-lg border border-brand-100 dark:border-brand-800/30 hover:bg-brand-100 transition shadow-sm">
-                            <i class="fas fa-plus mr-1"></i> Registrar
+                            <i class="fas fa-plus mr-1"></i> <span data-i18n="tracker.btn_register">Registrar</span>
                         </button>
                     </div>
 
@@ -349,7 +349,7 @@
                         <!-- Empty State (Injetado via JS se vazio) -->
                         <div class="text-center py-10 opacity-50">
                             <i class="fas fa-utensils text-4xl text-gray-300 mb-2"></i>
-                            <p class="text-xs text-gray-400">Seu diário está vazio hoje.</p>
+                            <p class="text-xs text-gray-400" data-i18n="tracker.empty_feed">Seu diário está vazio hoje.</p>
                         </div>
                     </div>
                 </div>
@@ -359,16 +359,16 @@
             <div id="tab-analytics" class="tab-content hidden space-y-6">
                 <!-- Range Selector -->
                 <div class="flex bg-white dark:bg-dark-card p-1 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border">
-                    <button onclick="Analytics.setRange(1)" id="btn-range-1" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition bg-brand-100 text-brand-700">Hoje</button>
-                    <button onclick="Analytics.setRange(7)" id="btn-range-7" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">7 Dias</button>
-                    <button onclick="Analytics.setRange(15)" id="btn-range-15" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">15 Dias</button>
-                    <button onclick="Analytics.setRange(30)" id="btn-range-30" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">30 Dias</button>
+                    <button onclick="Analytics.setRange(1)" id="btn-range-1" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition bg-brand-100 text-brand-700" data-i18n="analytics.range_1">Hoje</button>
+                    <button onclick="Analytics.setRange(7)" id="btn-range-7" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800" data-i18n="analytics.range_7">7 Dias</button>
+                    <button onclick="Analytics.setRange(15)" id="btn-range-15" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800" data-i18n="analytics.range_15">15 Dias</button>
+                    <button onclick="Analytics.setRange(30)" id="btn-range-30" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800" data-i18n="analytics.range_30">30 Dias</button>
                 </div>
 
                 <!-- Heatmap Section -->
                 <div class="glass-panel p-4 rounded-3xl">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase">Consistência</h3>
+                        <h3 class="text-xs font-bold text-gray-500 uppercase" data-i18n="analytics.consistency">Consistência</h3>
                         <div id="heatmap-month" class="text-[10px] font-bold text-brand-600 dark:text-brand-400">--</div>
                     </div>
                     
@@ -382,7 +382,7 @@
 
                 <!-- Metabolic Health Section -->
                 <div id="metabolic-health-section" class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Saúde Metabólica (Hoje)</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.metabolic_health">Saúde Metabólica (Hoje)</h3>
                     <div class="space-y-4" id="metabolic-bars-container">
                         <!-- Injected via JS -->
                     </div>
@@ -391,7 +391,7 @@
                 <!-- Average Intake Chart -->
                 <div class="glass-panel p-4 rounded-3xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase">Média Calórica</h3>
+                        <h3 class="text-xs font-bold text-gray-500 uppercase" data-i18n="analytics.avg_intake">Média Calórica</h3>
                         <span id="avg-intake-val" class="text-lg font-black text-gray-800 dark:text-white">--</span>
                     </div>
                     <div class="h-40 w-full relative">
@@ -405,7 +405,7 @@
                 <!-- Weight Projection -->
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden">
                     <i class="fas fa-chart-line absolute -bottom-4 -right-4 text-[100px] opacity-10"></i>
-                    <h3 class="text-[10px] font-bold opacity-70 uppercase tracking-widest mb-1">Previsão IA (30 Dias)</h3>
+                    <h3 class="text-[10px] font-bold opacity-70 uppercase tracking-widest mb-1" data-i18n="analytics.prediction_title">Previsão IA (30 Dias)</h3>
                     <div class="flex items-end gap-3">
                         <span id="proj-weight" class="text-4xl font-black tracking-tight">--</span>
                         <div class="mb-1.5">
@@ -413,12 +413,12 @@
                             <span id="proj-diff" class="text-xs font-bold bg-white/20 px-1.5 py-0.5 rounded ml-1">--</span>
                         </div>
                     </div>
-                    <p class="text-[9px] opacity-60 mt-3 max-w-[80%]">Baseado no seu déficit calórico médio e TMB atual.</p>
+                    <p class="text-[9px] opacity-60 mt-3 max-w-[80%]" data-i18n="analytics.prediction_subtitle">Baseado no seu déficit calórico médio e TMB atual.</p>
                 </div>
 
                 <!-- Exercise Evolution Chart -->
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Queima de Calorias (Exercícios)</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.exercise_burn">Queima de Calorias (Exercícios)</h3>
                     <div class="h-40 w-full">
                         <canvas id="chart-exercise"></canvas>
                     </div>
@@ -427,8 +427,8 @@
                 <!-- Quality Score Chart -->
                 <div class="glass-panel p-4 rounded-3xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase">Qualidade Alimentar (Score IA)</h3>
-                        <span id="avg-quality-label" class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-700">Média: --</span>
+                        <h3 class="text-xs font-bold text-gray-500 uppercase" data-i18n="analytics.quality_score">Qualidade Alimentar (Score IA)</h3>
+                        <span id="avg-quality-label" class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-700"><span data-i18n="analytics.quality_avg">Média:</span> --</span>
                     </div>
                     <div class="h-40 w-full">
                         <canvas id="chart-quality"></canvas>
@@ -440,7 +440,7 @@
 
                 <!-- Hydration Chart -->
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Hidratação Semanal</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.hydration_weekly">Hidratação Semanal</h3>
                     <div class="h-40 w-full">
                         <canvas id="chart-hydration"></canvas>
                     </div>
@@ -448,21 +448,21 @@
 
                 <!-- Charts Area -->
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Evolução de Peso</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.weight_evolution">Evolução de Peso</h3>
                     <div class="h-48 w-full">
                         <canvas id="chart-weight"></canvas>
                     </div>
                 </div>
 
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Medidas Corporais</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.body_measures">Medidas Corporais</h3>
                     <div class="h-48 w-full">
                         <canvas id="chart-measurements"></canvas>
                     </div>
                 </div>
 
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Média Horária de Fome</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4" data-i18n="analytics.hourly_hunger">Média Horária de Fome</h3>
                     <div class="h-40 w-full">
                         <canvas id="chart-hourly"></canvas>
                     </div>
@@ -487,34 +487,34 @@
                         </div>
                     </div>
                     <input type="file" id="inp-profile-pic" class="hidden" accept="image/*" onchange="Profile.handleImageUpload(this)">
-                    <h2 class="text-xl font-bold mt-3 text-gray-800 dark:text-white">Meu Perfil</h2>
-                    <p class="text-xs text-gray-400" id="profile-subtitle">Iniciante • Nível 1</p>
+                    <h2 class="text-xl font-bold mt-3 text-gray-800 dark:text-white" data-i18n="profile.title">Meu Perfil</h2>
+                    <p class="text-xs text-gray-400" id="profile-subtitle" data-i18n="profile.subtitle">Iniciante • Nível 1</p>
                 </div>
 
                 <!-- API USAGE MONITOR (Test Phase) -->
                 <div class="glass-panel p-4 rounded-3xl border-l-4 border-l-blue-500 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-[10px] font-bold text-blue-600 uppercase flex items-center gap-2">
-                            <i class="fas fa-microchip"></i> Monitor de API (Fase de Testes)
+                            <i class="fas fa-microchip"></i> <span data-i18n="profile.api_monitor">Monitor de API (Fase de Testes)</span>
                         </h3>
-                        <button onclick="App.resetApiUsage()" class="text-[9px] text-gray-400 hover:text-red-500 transition font-bold uppercase">Zerar</button>
+                        <button onclick="App.resetApiUsage()" class="text-[9px] text-gray-400 hover:text-red-500 transition font-bold uppercase" data-i18n="profile.reset">Zerar</button>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="text-center border-r border-gray-100 dark:border-gray-800">
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Requisições</p>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold" data-i18n="profile.requests">Requisições</p>
                             <p id="api-requests" class="text-xl font-black text-blue-600">0</p>
                         </div>
                         <div class="text-center">
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Tokens Totais</p>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold" data-i18n="profile.tokens">Tokens Totais</p>
                             <p id="api-tokens" class="text-xl font-black text-blue-600">0</p>
                         </div>
                     </div>
-                    <p class="text-[8px] text-gray-400 mt-2 italic text-center">* Limite Free Tier: 15 req/min e 1M tokens/min.</p>
+                    <p class="text-[8px] text-gray-400 mt-2 italic text-center" data-i18n="profile.free_tier">* Limite Free Tier: 15 req/min e 1M tokens/min.</p>
                 </div>
 
                 <!-- Badges Showcase -->
                 <div class="glass-panel p-4 rounded-3xl">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Conquistas (Badges)</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="profile.badges">Conquistas (Badges)</h3>
                     <div id="badges-grid" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         <!-- JS Injected -->
                     </div>
@@ -522,36 +522,36 @@
 
                 <!-- Settings Form -->
                 <div class="bg-white dark:bg-dark-card rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-dark-border">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 border-b border-gray-100 pb-2">Biometria & Metas</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 border-b border-gray-100 pb-2" data-i18n="profile.biometrics">Biometria & Metas</h3>
                     
                     <div class="mb-4">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase">Seu Nome</label>
-                        <input type="text" id="prof-name" class="input-field w-full rounded-xl p-2.5 text-sm font-bold mt-1 outline-none" placeholder="Como quer ser chamado?">
+                        <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.name_label">Seu Nome</label>
+                        <input type="text" id="prof-name" class="input-field w-full rounded-xl p-2.5 text-sm font-bold mt-1 outline-none" data-i18n="profile.name_placeholder" placeholder="Como quer ser chamado?">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Peso (kg)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.weight_label">Peso (kg)</label>
                             <input type="number" id="prof-weight" oninput="Profile.updateBMI()" class="input-field w-full rounded-xl p-2.5 text-sm font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Altura (cm)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.height_label">Altura (cm)</label>
                             <input type="number" id="prof-height" oninput="Profile.updateBMI()" class="input-field w-full rounded-xl p-2.5 text-sm font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Idade</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.age_label">Idade</label>
                             <input type="number" id="prof-age" class="input-field w-full rounded-xl p-2.5 text-sm font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Gênero</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.gender_label">Gênero</label>
                             <select id="prof-gender" class="input-field w-full rounded-xl p-2.5 text-xs font-bold mt-1 outline-none">
-                                <option value="male">Masculino</option>
-                                <option value="female">Feminino</option>
+                                <option value="male" data-i18n="profile.male">Masculino</option>
+                                <option value="female" data-i18n="profile.female">Feminino</option>
                             </select>
                         </div>
                     </div>
 
-                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 mt-6 border-b border-gray-100 pb-2">Medidas Corporais</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 mt-6 border-b border-gray-100 pb-2" data-i18n="profile.measures_title">Medidas Corporais</h3>
                     
                     <!-- Visual Mannequin for Measurements -->
                     <div class="flex justify-center mb-6 bg-gray-50 dark:bg-gray-900/50 py-4 rounded-2xl border border-gray-100 dark:border-gray-800">
@@ -567,29 +567,29 @@
                                 <line x1="15" x2="85" y1="120" y2="120" stroke="#ec4899" stroke-width="3" stroke-dasharray="4 2" />
                                 <circle cx="50" cy="120" r="4" fill="#ec4899" />
                             </svg>
-                            <div class="absolute top-[65px] -right-16 text-[9px] font-bold text-red-500 bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm border border-red-100">Cintura</div>
-                            <div class="absolute top-[100px] -left-16 text-[9px] font-bold text-pink-500 bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm border border-pink-100">Quadril</div>
+                            <div class="absolute top-[65px] -right-16 text-[9px] font-bold text-red-500 bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm border border-red-100" data-i18n="profile.visual_waist">Cintura</div>
+                            <div class="absolute top-[100px] -left-16 text-[9px] font-bold text-pink-500 bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm border border-pink-100" data-i18n="profile.visual_hip">Quadril</div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-3 mb-4">
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Cintura (cm)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.waist_label">Cintura (cm)</label>
                             <input type="number" id="prof-waist" class="input-field w-full rounded-xl p-2 text-xs font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Quadril (cm)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.hip_label">Quadril (cm)</label>
                             <input type="number" id="prof-hip" class="input-field w-full rounded-xl p-2 text-xs font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">% Gordura</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.fat_label">% Gordura</label>
                             <input type="number" id="prof-fat" class="input-field w-full rounded-xl p-2 text-xs font-bold mt-1 outline-none">
                         </div>
                     </div>
 
-                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 mt-6 border-b border-gray-100 pb-2">Notificações</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 mt-6 border-b border-gray-100 pb-2" data-i18n="profile.notifications_title">Notificações</h3>
                     <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl mb-4">
-                        <span class="text-xs font-bold text-gray-600 dark:text-gray-300">Lembretes Ativos</span>
+                        <span class="text-xs font-bold text-gray-600 dark:text-gray-300" data-i18n="profile.reminders_active">Lembretes Ativos</span>
                         <button onclick="App.toggleNotifications()" id="btn-notif-toggle" class="w-10 h-6 bg-gray-300 rounded-full relative transition-colors">
                             <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform" id="notif-toggle-dot"></div>
                         </button>
@@ -598,7 +598,7 @@
                     <!-- BMI Display Component -->
                     <div id="bmi-display-area" class="mb-4 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-800 transition-all">
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold uppercase text-gray-500">Seu IMC</span>
+                            <span class="text-[10px] font-bold uppercase text-gray-500" data-i18n="profile.bmi_title">Seu IMC</span>
                             <span id="bmi-value-text" class="text-xs font-black">--</span>
                         </div>
                         <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden flex">
@@ -608,21 +608,21 @@
                             <div class="h-full bg-red-500 flex-grow"></div>
                         </div>
                         <div class="flex justify-between mt-1 text-[8px] text-gray-400 font-bold">
-                            <span class="text-blue-400">Magreza</span>
-                            <span class="text-green-500">Normal</span>
-                            <span class="text-yellow-500">Sobrepeso</span>
-                            <span class="text-red-500">Obesidade</span>
+                            <span class="text-blue-400" data-i18n="profile.bmi_underweight">Magreza</span>
+                            <span class="text-green-500" data-i18n="profile.bmi_normal">Normal</span>
+                            <span class="text-yellow-500" data-i18n="profile.bmi_overweight">Sobrepeso</span>
+                            <span class="text-red-500" data-i18n="profile.bmi_obesity">Obesidade</span>
                         </div>
-                        <p id="bmi-classification" class="text-center text-xs font-bold mt-2 text-gray-600 dark:text-gray-300">Calcule seu IMC</p>
+                        <p id="bmi-classification" class="text-center text-xs font-bold mt-2 text-gray-600 dark:text-gray-300" data-i18n="profile.bmi_calculate">Calcule seu IMC</p>
                     </div>
 
                     <div class="mb-4">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase">Estratégia Nutricional</label>
+                        <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.strategy_label">Estratégia Nutricional</label>
                         <select id="prof-strategy" onchange="Profile.toggleCustomMacros()" class="input-field w-full rounded-xl p-3 text-xs font-bold mt-1 outline-none">
-                            <option value="balanced">⚖️ Equilibrada (30P / 40C / 30G)</option>
-                            <option value="lowcarb">🥩 Low Carb (45P / 15C / 40G)</option>
-                            <option value="ketogenic">🥑 Cetogênica (25P / 5C / 70G)</option>
-                            <option value="custom">🛠️ Personalizada</option>
+                            <option value="balanced" data-i18n="profile.strat_balanced">⚖️ Equilibrada (30P / 40C / 30G)</option>
+                            <option value="lowcarb" data-i18n="profile.strat_lowcarb">🥩 Low Carb (45P / 15C / 40G)</option>
+                            <option value="ketogenic" data-i18n="profile.strat_keto">🥑 Cetogênica (25P / 5C / 70G)</option>
+                            <option value="custom" data-i18n="profile.strat_custom">🛠️ Personalizada</option>
                         </select>
                         
                         <!-- Custom Macros Fields -->
@@ -635,27 +635,27 @@
 
                     <div class="grid grid-cols-2 gap-3 mt-4">
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Meta Kcal</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.target_kcal">Meta Kcal</label>
                             <input type="number" id="prof-target" class="input-field w-full rounded-xl p-3 text-green-600 font-bold text-center text-lg mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Meta Fibras</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.target_fiber">Meta Fibras</label>
                             <input type="number" id="prof-fiber" class="input-field w-full rounded-xl p-3 text-emerald-600 font-bold text-center text-lg mt-1 outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Max Sódio (mg)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.max_sodium">Max Sódio (mg)</label>
                             <input type="number" id="prof-sodium" class="input-field w-full rounded-xl p-3 text-red-500 font-bold text-center text-lg mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] text-gray-400 font-bold uppercase">Max Açúcar (g)</label>
+                            <label class="text-[10px] text-gray-400 font-bold uppercase" data-i18n="profile.max_sugar">Max Açúcar (g)</label>
                             <input type="number" id="prof-sugar" class="input-field w-full rounded-xl p-3 text-orange-500 font-bold text-center text-lg mt-1 outline-none">
                         </div>
                     </div>
 
-                    <button onclick="Profile.save(true)" class="w-full mt-6 bg-gray-900 dark:bg-white dark:text-black text-white py-3.5 rounded-xl font-bold hover:scale-[1.01] transition shadow-lg btn-press">
+                    <button onclick="Profile.save(true)" class="w-full mt-6 bg-gray-900 dark:bg-white dark:text-black text-white py-3.5 rounded-xl font-bold hover:scale-[1.01] transition shadow-lg btn-press" data-i18n="profile.btn_save">
                         Salvar Alterações
                     </button>
                 </div>
@@ -663,18 +663,18 @@
                 <!-- Data Management -->
                 <div class="p-2 space-y-2">
                     <button onclick="App.exportData()" class="w-full bg-white dark:bg-dark-card p-3 rounded-xl text-left text-xs font-bold text-blue-500 flex items-center gap-3 shadow-sm">
-                        <i class="fas fa-file-export text-lg"></i> Backup de Dados (JSON)
+                        <i class="fas fa-file-export text-lg"></i> <span data-i18n="profile.backup_export">Backup de Dados (JSON)</span>
                     </button>
                     <label class="w-full bg-white dark:bg-dark-card p-3 rounded-xl text-left text-xs font-bold text-purple-500 flex items-center gap-3 shadow-sm cursor-pointer">
-                        <i class="fas fa-file-import text-lg"></i> Restaurar Backup
+                        <i class="fas fa-file-import text-lg"></i> <span data-i18n="profile.backup_import">Restaurar Backup</span>
                         <input type="file" class="hidden" accept=".json" onchange="App.importData(this)">
                     </label>
                     <button onclick="App.resetAll()" class="w-full bg-red-50 dark:bg-red-900/10 p-3 rounded-xl text-left text-xs font-bold text-red-500 flex items-center gap-3 border border-red-100 dark:border-red-900/30">
-                        <i class="fas fa-trash text-lg"></i> Resetar Fábrica
+                        <i class="fas fa-trash text-lg"></i> <span data-i18n="profile.factory_reset">Resetar Fábrica</span>
                     </button>
                 </div>
                 
-                <div class="text-center text-[9px] text-gray-300 pb-4">
+                <div class="text-center text-[9px] text-gray-300 pb-4" data-i18n="app.version">
                     QuantixNutri Ultimate v2.0 Final Build
                 </div>
             </div>
@@ -685,22 +685,22 @@
         <nav class="absolute bottom-12 left-4 right-4 h-20 bg-white/95 dark:bg-dark-card/95 backdrop-blur border border-gray-100 dark:border-dark-border flex justify-around items-start pt-4 z-40 pb-6 rounded-2xl shadow-xl">
             <button onclick="App.switchTab('tracker')" class="nav-item active flex flex-col items-center w-1/3 btn-press group">
                 <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wide">Diário</span>
+                <span class="text-[9px] font-bold uppercase tracking-wide" data-i18n="tab.tracker">Diário</span>
                 <div class="nav-indicator"></div>
             </button>
             <button onclick="App.switchTab('analytics')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
                 <i class="fas fa-chart-pie text-xl mb-1 group-hover:scale-110 transition"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wide">Análise</span>
+                <span class="text-[9px] font-bold uppercase tracking-wide" data-i18n="tab.analytics">Análise</span>
                 <div class="nav-indicator"></div>
             </button>
             <button onclick="App.switchTab('planner')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
                 <i class="fas fa-calendar-check text-xl mb-1 group-hover:scale-110 transition"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wide">Plano</span>
+                <span class="text-[9px] font-bold uppercase tracking-wide" data-i18n="tab.planner">Plano</span>
                 <div class="nav-indicator"></div>
             </button>
             <button onclick="App.switchTab('profile')" class="nav-item flex flex-col items-center w-1/4 btn-press group">
                 <i class="fas fa-user-astronaut text-xl mb-1 group-hover:scale-110 transition"></i>
-                <span class="text-[9px] font-bold uppercase tracking-wide">Perfil</span>
+                <span class="text-[9px] font-bold uppercase tracking-wide" data-i18n="tab.profile">Perfil</span>
                 <div class="nav-indicator"></div>
             </button>
         </nav>
@@ -713,23 +713,23 @@
                 </div>
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Configurar API</h3>
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white" data-i18n="modal.apikey_title">Configurar API</h3>
                     </div>
 
                     <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/30 mb-4">
-                        <p class="text-xs text-blue-700 dark:text-blue-300">
+                        <p class="text-xs text-blue-700 dark:text-blue-300" data-i18n="modal.apikey_desc">
                             Para usar a IA, você precisa de uma chave gratuita do Google Gemini.
                         </p>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="block mt-2 text-xs font-bold text-blue-600 underline hover:text-blue-800">Obter Chave Aqui &rarr;</a>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="block mt-2 text-xs font-bold text-blue-600 underline hover:text-blue-800" data-i18n="modal.apikey_link">Obter Chave Aqui &rarr;</a>
                     </div>
 
-                    <label class="text-[10px] font-bold text-gray-400 uppercase">Sua API Key</label>
-                    <input type="text" id="inp-apikey" placeholder="Cole sua chave aqui..." class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 mb-4 outline-none border border-gray-200 dark:border-gray-700">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="modal.apikey_label">Sua API Key</label>
+                    <input type="text" id="inp-apikey" data-i18n="modal.apikey_placeholder" placeholder="Cole sua chave aqui..." class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 mb-4 outline-none border border-gray-200 dark:border-gray-700">
 
-                    <button onclick="App.saveApiKey()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press">
+                    <button onclick="App.saveApiKey()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press" data-i18n="modal.apikey_btn">
                         Salvar e Iniciar
                     </button>
-                    <p class="text-[9px] text-center text-gray-400 mt-4">Sua chave fica salva apenas no seu dispositivo.</p>
+                    <p class="text-[9px] text-center text-gray-400 mt-4" data-i18n="modal.apikey_footer">Sua chave fica salva apenas no seu dispositivo.</p>
                 </div>
             </div>
         </div>
@@ -742,7 +742,7 @@
                 </div>
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Lista de Compras</h3>
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white" data-i18n="modal.shopping_title">Lista de Compras</h3>
                         <button onclick="Modal.close('shopping-list')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                     </div>
                     <div id="shopping-list-container"></div>
@@ -758,22 +758,22 @@
                 </div>
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800 dark:text-white">Ajustar Jejum</h3>
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white" data-i18n="modal.fasting_title">Ajustar Jejum</h3>
                         <button onclick="Modal.close('fasting-edit')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                     </div>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Início</label>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="modal.fasting_start">Início</label>
                             <input type="datetime-local" id="inp-fasting-start" class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 outline-none">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Fim (Opcional)</label>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase" data-i18n="modal.fasting_end">Fim (Opcional)</label>
                             <input type="datetime-local" id="inp-fasting-end" class="input-field w-full rounded-xl p-3 text-sm font-bold mt-1 outline-none">
-                            <p class="text-[9px] text-gray-400 mt-1">Deixe em branco se o jejum ainda estiver ativo.</p>
+                            <p class="text-[9px] text-gray-400 mt-1" data-i18n="modal.fasting_hint">Deixe em branco se o jejum ainda estiver ativo.</p>
                         </div>
 
-                        <button onclick="Fasting.save()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press">
+                        <button onclick="Fasting.save()" class="w-full py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg btn-press" data-i18n="modal.fasting_btn">
                             Salvar Ajuste
                         </button>
                     </div>
@@ -790,7 +790,7 @@
                 
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg">Registrar Alimento</h3>
+                        <h3 class="font-bold text-lg" data-i18n="modal.add_food_title">Registrar Alimento</h3>
                         <button onclick="Modal.close('add-food')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                     </div>
 
@@ -798,21 +798,21 @@
                     <div id="inp-area-review" class="hidden space-y-4 animate-fade-in">
                         <div class="bg-brand-50 dark:bg-brand-900/10 p-4 rounded-xl border border-brand-100 dark:border-brand-800/30">
                             <h4 class="text-xs font-bold text-brand-600 uppercase mb-3 flex items-center gap-2">
-                                <i class="fas fa-edit"></i> Revisar Itens Identificados
+                                <i class="fas fa-edit"></i> <span data-i18n="modal.review_title">Revisar Itens Identificados</span>
                             </h4>
                             
                             <div id="review-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-1 custom-scrollbar">
                                 <!-- Items will be injected here -->
                             </div>
 
-                            <button onclick="App.addManualReviewItem()" class="mt-3 w-full py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-xs font-bold text-gray-500 hover:text-brand-500 hover:border-brand-500 transition">
+                            <button onclick="App.addManualReviewItem()" class="mt-3 w-full py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-xs font-bold text-gray-500 hover:text-brand-500 hover:border-brand-500 transition" data-i18n="modal.btn_add_manual">
                                 + Adicionar Item Manual
                             </button>
                         </div>
                         
                         <!-- Totals Summary -->
                         <div class="flex justify-between items-center px-2">
-                             <span class="text-xs font-bold text-gray-500">Total Estimado:</span>
+                             <span class="text-xs font-bold text-gray-500" data-i18n="modal.total_estimated">Total Estimado:</span>
                              <span id="review-total-cals" class="text-xl font-black text-brand-600">0 kcal</span>
                         </div>
 
@@ -820,15 +820,15 @@
                         <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-xl border border-yellow-100 dark:border-yellow-800/30">
                             <label class="flex items-center gap-2 cursor-pointer mb-2">
                                 <input type="checkbox" id="check-save-combo" onchange="App.toggleSaveCombo()" class="w-4 h-4 text-brand-500 rounded focus:ring-brand-500 border-gray-300">
-                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Salvar como Combo</span>
+                                <span class="text-xs font-bold text-gray-700 dark:text-gray-300" data-i18n="modal.save_combo">Salvar como Combo</span>
                             </label>
-                            <input type="text" id="inp-combo-name" placeholder="Nome do Combo (ex: Café Campeão)" class="hidden input-field w-full rounded-lg p-2 text-xs font-bold bg-white dark:bg-gray-800 outline-none border border-gray-200 dark:border-gray-700">
+                            <input type="text" id="inp-combo-name" data-i18n="modal.combo_placeholder" placeholder="Nome do Combo (ex: Café Campeão)" class="hidden input-field w-full rounded-lg p-2 text-xs font-bold bg-white dark:bg-gray-800 outline-none border border-gray-200 dark:border-gray-700">
                         </div>
 
                         <div class="flex gap-2">
-                            <button onclick="App.cancelReview()" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">Cancelar</button>
+                            <button onclick="App.cancelReview()" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold" data-i18n="modal.btn_cancel">Cancelar</button>
                             <button onclick="App.confirmReview()" class="flex-[2] py-3 bg-brand-500 text-white rounded-xl font-bold shadow-lg flex justify-center items-center gap-2">
-                                <i class="fas fa-save"></i> Confirmar Tudo
+                                <i class="fas fa-save"></i> <span data-i18n="modal.btn_confirm">Confirmar Tudo</span>
                             </button>
                         </div>
                     </div>
@@ -837,10 +837,10 @@
                     <div id="inp-wrapper-normal">
                         <!-- Input Method Tabs -->
                         <div class="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
-                            <button onclick="Input.setMode('ai')" id="btn-mode-ai" class="flex-1 whitespace-nowrap px-3 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold transition">IA Nutri</button>
-                            <button onclick="Input.setMode('manual')" id="btn-mode-manual" class="flex-1 whitespace-nowrap px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-xl text-xs font-bold transition">Manual</button>
-                            <button onclick="Input.setMode('combos')" id="btn-mode-combos" class="flex-1 whitespace-nowrap px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-xl text-xs font-bold transition">Meus Combos</button>
-                            <button onclick="Input.setMode('exercise')" id="btn-mode-exercise" class="flex-1 whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl text-xs font-bold transition">Exercício</button>
+                            <button onclick="Input.setMode('ai')" id="btn-mode-ai" class="flex-1 whitespace-nowrap px-3 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold transition" data-i18n="modal.tab_ai">IA Nutri</button>
+                            <button onclick="Input.setMode('manual')" id="btn-mode-manual" class="flex-1 whitespace-nowrap px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-xl text-xs font-bold transition" data-i18n="modal.tab_manual">Manual</button>
+                            <button onclick="Input.setMode('combos')" id="btn-mode-combos" class="flex-1 whitespace-nowrap px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-xl text-xs font-bold transition" data-i18n="modal.tab_combos">Meus Combos</button>
+                            <button onclick="Input.setMode('exercise')" id="btn-mode-exercise" class="flex-1 whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-500 border border-blue-100 rounded-xl text-xs font-bold transition" data-i18n="modal.tab_exercise">Exercício</button>
                         </div>
 
                         <!-- Category Selector -->
@@ -860,7 +860,7 @@
                                     <div class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition">
                                         <i class="fas fa-camera text-lg"></i>
                                     </div>
-                                    <span class="text-[10px] font-bold uppercase">Tirar Foto</span>
+                                    <span class="text-[10px] font-bold uppercase" data-i18n="modal.btn_camera">Tirar Foto</span>
                                 </button>
                                 
                                 <!-- FILE UPLOAD BUTTON -->
@@ -868,13 +868,13 @@
                                     <div class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition">
                                         <i class="fas fa-image text-lg"></i>
                                     </div>
-                                    <span class="text-[10px] font-bold uppercase">Galeria</span>
+                                    <span class="text-[10px] font-bold uppercase" data-i18n="modal.btn_gallery">Galeria</span>
                                 </button>
                                 <input type="file" id="inp-image" class="hidden" accept="image/*" onchange="App.handleImagePreview(this)">
                             </div>
                             
                             <div class="space-y-2 relative">
-                                <textarea id="ai-desc" placeholder="Descreva sua refeição em detalhes (ex: 2 pratos de arroz, 2 fatias de tender e 3 batatas cozidas)..." class="input-field w-full h-32 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
+                                <textarea id="ai-desc" data-i18n="modal.placeholder_desc" placeholder="Descreva sua refeição em detalhes (ex: 2 pratos de arroz, 2 fatias de tender e 3 batatas cozidas)..." class="input-field w-full h-32 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
                                 <button onclick="Voice.start('ai-desc')" id="btn-mic-ai-desc" class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-brand-500 flex items-center justify-center transition">
                                     <i class="fas fa-microphone"></i>
                                 </button>
@@ -895,14 +895,14 @@
                             </div>
 
                             <button onclick="App.analyzeAI()" id="btn-analyze" class="w-full py-4 bg-gradient-to-r from-brand-500 to-emerald-600 text-white rounded-xl font-bold shadow-glow-green btn-press flex justify-center items-center gap-2">
-                                <span>Analisar</span> <i class="fas fa-wand-magic-sparkles"></i>
+                                <span data-i18n="modal.btn_analyze">Analisar</span> <i class="fas fa-wand-magic-sparkles"></i>
                             </button>
-                            <p id="ai-loading" class="hidden text-center text-xs text-brand-600 animate-pulse font-bold">Processando imagem e contexto...</p>
+                            <p id="ai-loading" class="hidden text-center text-xs text-brand-600 animate-pulse font-bold" data-i18n="app.processing">Processando imagem e contexto...</p>
                         </div>
 
                         <!-- Manual Input Area -->
                         <div id="inp-area-manual" class="hidden space-y-3">
-                            <input type="text" id="man-desc" placeholder="Nome do alimento" class="input-field w-full rounded-xl p-3 text-sm font-bold">
+                            <input type="text" id="man-desc" data-i18n="modal.manual_name_placeholder" placeholder="Nome do alimento" class="input-field w-full rounded-xl p-3 text-sm font-bold">
                             <div class="grid grid-cols-2 gap-3">
                                 <input type="number" id="man-cals" placeholder="Calorias (kcal)" class="input-field w-full rounded-xl p-3 text-sm">
                                 <input type="number" id="man-prot" placeholder="Proteína (g)" class="input-field w-full rounded-xl p-3 text-sm">
@@ -910,18 +910,18 @@
                                 <input type="number" id="man-fat" placeholder="Gordura (g)" class="input-field w-full rounded-xl p-3 text-sm">
                             </div>
                             <input type="number" id="man-fiber" placeholder="Fibras (g)" class="input-field w-full rounded-xl p-3 text-sm">
-                            <button onclick="App.addManual()" class="w-full py-3 bg-gray-900 text-white rounded-xl font-bold btn-press">Adicionar Manualmente</button>
+                            <button onclick="App.addManual()" class="w-full py-3 bg-gray-900 text-white rounded-xl font-bold btn-press" data-i18n="modal.manual_btn">Adicionar Manualmente</button>
                         </div>
 
                         <!-- Combos Input Area -->
                         <div id="inp-area-combos" class="hidden space-y-3">
                             <div class="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-800/30">
                                 <h4 class="text-xs font-bold text-purple-600 uppercase mb-3 flex items-center gap-2">
-                                    <i class="fas fa-layer-group"></i> Meus Combos Salvos
+                                    <i class="fas fa-layer-group"></i> <span data-i18n="modal.combos_title">Meus Combos Salvos</span>
                                 </h4>
                                 <div id="combo-list" class="space-y-3 max-h-[40vh] overflow-y-auto pr-1 custom-scrollbar">
                                     <!-- Injected via JS -->
-                                    <p class="text-center text-xs text-gray-400 py-4">Você ainda não salvou nenhum combo.</p>
+                                    <p class="text-center text-xs text-gray-400 py-4" data-i18n="modal.combos_empty">Você ainda não salvou nenhum combo.</p>
                                 </div>
                             </div>
                         </div>
@@ -929,28 +929,28 @@
                         <!-- Exercise Input Area -->
                         <div id="inp-area-exercise" class="hidden space-y-3">
                             <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-800/30">
-                                <h4 class="text-xs font-bold text-blue-500 uppercase mb-2">Registrar Atividade</h4>
+                                <h4 class="text-xs font-bold text-blue-500 uppercase mb-2" data-i18n="modal.exercise_title">Registrar Atividade</h4>
                                 <div class="relative mb-2">
-                                    <input type="text" id="exe-desc" placeholder="Ex: Corrida 5km" class="input-field w-full rounded-xl p-3 text-sm font-bold pr-10">
+                                    <input type="text" id="exe-desc" data-i18n="modal.exercise_placeholder" placeholder="Ex: Corrida 5km" class="input-field w-full rounded-xl p-3 text-sm font-bold pr-10">
                                     <button onclick="Voice.start('exe-desc')" id="btn-mic-exe-desc" class="absolute top-1/2 -translate-y-1/2 right-2 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-blue-500 flex items-center justify-center transition">
                                         <i class="fas fa-microphone"></i>
                                     </button>
                                 </div>
                                 
                                 <button onclick="App.analyzeExerciseAI()" id="btn-analyze-ex" class="w-full py-2 mb-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-blue-200 transition">
-                                    <i class="fas fa-magic"></i> Calcular Gasto com IA
+                                    <i class="fas fa-magic"></i> <span data-i18n="modal.exercise_btn_ai">Calcular Gasto com IA</span>
                                 </button>
-                                <p id="ex-loading" class="hidden text-center text-xs text-blue-500 animate-pulse font-bold mb-2">Calculando esforço...</p>
+                                <p id="ex-loading" class="hidden text-center text-xs text-blue-500 animate-pulse font-bold mb-2" data-i18n="app.calculating">Calculando esforço...</p>
 
                                 <input type="number" id="exe-cals" placeholder="Calorias Queimadas (kcal)" class="input-field w-full rounded-xl p-3 text-sm font-bold">
                             </div>
-                            <button onclick="App.addExercise()" class="w-full py-3 bg-blue-500 text-white rounded-xl font-bold btn-press shadow-glow-blue">Registrar Queima 🔥</button>
+                            <button onclick="App.addExercise()" class="w-full py-3 bg-blue-500 text-white rounded-xl font-bold btn-press shadow-glow-blue" data-i18n="modal.exercise_btn_save">Registrar Queima 🔥</button>
                         </div>
                     </div>
 
                     <!-- Favorites / Recent -->
                     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Sugestões Rápidas</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2" data-i18n="modal.quick_suggestions">Sugestões Rápidas</p>
                         <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="quick-add-container">
                             <!-- Injected -->
                         </div>
@@ -967,19 +967,19 @@
                 </div>
                 <div class="px-5">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg">Limpa Geladeira IA</h3>
+                        <h3 class="font-bold text-lg" data-i18n="modal.fridge_title">Limpa Geladeira IA</h3>
                         <button onclick="Modal.close('fridge')" class="text-gray-400"><i class="fas fa-times text-xl"></i></button>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4">Diga o que você tem em casa ou tire uma foto da sua geladeira/despensa.</p>
+                    <p class="text-xs text-gray-400 mb-4" data-i18n="modal.fridge_desc">Diga o que você tem em casa ou tire uma foto da sua geladeira/despensa.</p>
                     
                     <div class="flex gap-3 mb-4">
                         <button onclick="App.openCamera('fridge')" class="flex-1 h-20 bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition group">
                             <i class="fas fa-camera text-lg mb-1 group-hover:scale-110 transition"></i>
-                            <span class="text-[9px] font-bold uppercase">Câmera</span>
+                            <span class="text-[9px] font-bold uppercase" data-i18n="modal.btn_camera">Câmera</span>
                         </button>
                         <button onclick="document.getElementById('fridge-image-input').click()" class="flex-1 h-20 bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 hover:border-blue-500 transition group">
                             <i class="fas fa-image text-lg mb-1 group-hover:scale-110 transition"></i>
-                            <span class="text-[9px] font-bold uppercase">Galeria</span>
+                            <span class="text-[9px] font-bold uppercase" data-i18n="modal.btn_gallery">Galeria</span>
                         </button>
                         <input type="file" id="fridge-image-input" class="hidden" accept="image/*" onchange="App.handleImagePreview(this, 'fridge')">
                     </div>
@@ -990,28 +990,29 @@
                     </div>
 
                     <div class="relative mb-4">
-                        <textarea id="fridge-ingredients" placeholder="Ex: 2 ovos, meio tomate, um pouco de queijo e sobras de frango..." class="input-field w-full h-24 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
+                        <textarea id="fridge-ingredients" data-i18n="modal.fridge_placeholder" placeholder="Ex: 2 ovos, meio tomate, um pouco de queijo e sobras de frango..." class="input-field w-full h-24 rounded-2xl p-3 text-sm outline-none resize-none"></textarea>
                         <button onclick="Voice.start('fridge-ingredients')" id="btn-mic-fridge-ingredients" class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-blue-500 flex items-center justify-center transition">
                             <i class="fas fa-microphone"></i>
                         </button>
                     </div>
                     
                     <button onclick="App.fridgeClearoutAI()" id="btn-fridge-analyze" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold shadow-lg btn-press flex justify-center items-center gap-2">
-                        <span>Gerar Receita</span> <i class="fas fa-magic"></i>
+                        <span data-i18n="modal.fridge_btn">Gerar Receita</span> <i class="fas fa-magic"></i>
                     </button>
                     
                     <div id="fridge-result" class="hidden mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
-                        <h4 class="text-xs font-bold text-blue-600 uppercase mb-2">Sugestão do Chef:</h4>
+                        <h4 class="text-xs font-bold text-blue-600 uppercase mb-2" data-i18n="modal.fridge_result_title">Sugestão do Chef:</h4>
                         <div id="fridge-recipe-text" class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"></div>
-                        <button onclick="Modal.close('fridge')" class="mt-4 w-full py-2 bg-gray-200 dark:bg-gray-800 rounded-lg text-xs font-bold">Entendido!</button>
+                        <button onclick="Modal.close('fridge')" class="mt-4 w-full py-2 bg-gray-200 dark:bg-gray-800 rounded-lg text-xs font-bold" data-i18n="modal.fridge_btn_ok">Entendido!</button>
                     </div>
                     
-                    <p id="fridge-loading" class="hidden text-center text-xs text-blue-600 animate-pulse font-bold mt-4">Criando receita personalizada...</p>
+                    <p id="fridge-loading" class="hidden text-center text-xs text-blue-600 animate-pulse font-bold mt-4" data-i18n="app.creating_recipe">Criando receita personalizada...</p>
                 </div>
             </div>
         </div>
 
     </div>
+    <script type="module" src="./js/services/i18n.js"></script>
     <script type="module" src="./js/app.js"></script>
 </body>
 </html>
