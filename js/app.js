@@ -943,7 +943,7 @@ export const App = {
         r.readAsText(file);
     },
     resetAll: () => {
-        if(confirm("ATENÇÃO: Isso apaga tudo. Continuar?")) { localStorage.clear(); location.reload(); }
+        if(confirm("Tem certeza que deseja apagar todos os dados?")) { localStorage.clear(); location.reload(); }
     }
 };
 

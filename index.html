@@ -186,12 +186,15 @@
         <!-- TOP HEADER -->
         <header class="glass-header h-16 px-4 flex justify-between items-center z-30 absolute top-0 w-full">
             <div class="flex items-center gap-3">
-                <div class="relative header-profile-container group">
-                    <img id="header-profile-img" src="" onclick="location.reload()" title="Clique para atualizar o sistema" class="w-9 h-9 rounded-full object-cover bg-gray-200 border border-brand-500 cursor-pointer hover:opacity-90 transition" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
-                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center border border-white dark:border-dark-card shadow-sm z-20 animate-pulse pointer-events-none">
-                        <i class="fas fa-sync-alt text-white text-[8px]"></i>
+                <div class="flex flex-col items-center">
+                    <div class="relative header-profile-container group">
+                        <img id="header-profile-img" src="" onclick="location.reload()" title="Clique para atualizar o sistema" class="w-9 h-9 rounded-full object-cover bg-gray-200 border border-brand-500 cursor-pointer hover:opacity-90 transition" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center border border-white dark:border-dark-card shadow-sm z-20 animate-pulse pointer-events-none">
+                            <i class="fas fa-sync-alt text-white text-[8px]"></i>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-bold px-1 rounded-full border border-white text-yellow-900 shadow-sm z-10" id="user-level-badge">LVL 1</div>
                     </div>
-                    <div class="absolute -bottom-1 -right-1 bg-yellow-400 text-[8px] font-bold px-1 rounded-full border border-white text-yellow-900 shadow-sm z-10" id="user-level-badge">LVL 1</div>
+                    <span class="text-[8px] text-gray-400 mt-0.5 cursor-pointer hover:text-brand-500 transition" onclick="location.reload()">Clique p/ atualizar</span>
                 </div>
                 <div>
                     <h1 class="font-bold text-sm text-gray-800 dark:text-white leading-tight" id="header-username">Quantix<span class="text-brand-500">AI</span></h1>
@@ -356,8 +359,8 @@
             <div id="tab-analytics" class="tab-content hidden space-y-6">
                 <!-- Range Selector -->
                 <div class="flex bg-white dark:bg-dark-card p-1 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border">
-                    <button onclick="Analytics.setRange(1)" id="btn-range-1" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Hoje</button>
-                    <button onclick="Analytics.setRange(7)" id="btn-range-7" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition bg-brand-100 text-brand-700">7 Dias</button>
+                    <button onclick="Analytics.setRange(1)" id="btn-range-1" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition bg-brand-100 text-brand-700">Hoje</button>
+                    <button onclick="Analytics.setRange(7)" id="btn-range-7" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">7 Dias</button>
                     <button onclick="Analytics.setRange(15)" id="btn-range-15" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">15 Dias</button>
                     <button onclick="Analytics.setRange(30)" id="btn-range-30" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">30 Dias</button>
                 </div>
@@ -478,7 +481,7 @@
                 <!-- Profile Header -->
                 <div class="text-center pt-2">
                     <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-brand-300 to-brand-600 p-1 shadow-glow-green relative group cursor-pointer transition-transform hover:scale-105" onclick="document.getElementById('inp-profile-pic').click()">
-                        <img id="profile-main-img" class="w-full h-full rounded-full object-cover bg-white dark:bg-dark-card" src="" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                        <img id="profile-main-img" class="w-full h-full rounded-full object-cover bg-white dark:bg-dark-card" src="" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=User&background=random'">
                         <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm">
                             <i class="fas fa-camera text-white text-xl"></i>
                         </div>

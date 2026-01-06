@@ -4,7 +4,7 @@ import { UI } from './interface.js';
 
 export const Analytics = {
     charts: {},
-    currentRange: 7,
+    currentRange: 1,
 
     setRange: (days) => {
         Analytics.currentRange = days;
@@ -66,6 +66,38 @@ export const Analytics = {
             }
         }
         return `canvas-${id}`;
+    },
+
+    renderNoData: (canvasId, message = "Sem dados para este período") => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const container = canvas.parentElement;
+        if (!container) return;
+
+        // Check if message already exists
+        if (container.querySelector('.no-data-msg')) return;
+
+        // Hide canvas, show message
+        canvas.style.display = 'none';
+
+        const msg = document.createElement('div');
+        msg.className = 'no-data-msg absolute inset-0 flex flex-col items-center justify-center text-center opacity-70';
+        msg.innerHTML = `
+            <i class="fas fa-chart-area text-gray-300 text-2xl mb-2"></i>
+            <span class="text-[10px] text-gray-400 font-bold">${message}</span>
+        `;
+        container.appendChild(msg);
+    },
+
+    resetChartState: (canvasId) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const container = canvas.parentElement;
+        if (!container) return;
+
+        canvas.style.display = 'block';
+        const msg = container.querySelector('.no-data-msg');
+        if (msg) msg.remove();
     },
 
     render: () => {
@@ -179,15 +211,20 @@ export const Analytics = {
              }
         }
 
-        Analytics.drawChart('chart-intake', 'doughnut', {
-            labels: ['Consumido', 'Restante'],
-            datasets: [{
-                data: [avgIntake, Math.max(0, targetCals - avgIntake)],
-                backgroundColor: [avgIntake > targetCals ? '#ef4444' : '#3b82f6', '#f3f4f6'],
-                borderWidth: 0,
-                cutout: '75%'
-            }]
-        }, { plugins: { tooltip: { enabled: true } } });
+        Analytics.resetChartState('chart-intake');
+        if (daysWithFood === 0) {
+            Analytics.renderNoData('chart-intake');
+        } else {
+            Analytics.drawChart('chart-intake', 'doughnut', {
+                labels: ['Consumido', 'Restante'],
+                datasets: [{
+                    data: [avgIntake, Math.max(0, targetCals - avgIntake)],
+                    backgroundColor: [avgIntake > targetCals ? '#ef4444' : '#3b82f6', '#f3f4f6'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            }, { plugins: { tooltip: { enabled: true } } });
+        }
 
         const bmr = Analytics.calculateBMR(p);
         const avgBurn = daysToRender > 0 ? (totalBurn / daysToRender) : 0;
@@ -214,17 +251,22 @@ export const Analytics = {
         const qualLabel = document.getElementById('avg-quality-label');
         if (qualLabel) qualLabel.innerHTML = `Média: <span class="${qualityTrend}">${avgPeriodScore.toFixed(1)}</span>`;
 
-        Analytics.drawChart('chart-quality', 'line', {
-            labels: labels,
-            datasets: [{
-                label: 'Qualidade (1-10)',
-                data: dataQuality,
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                pointBackgroundColor: dataQuality.map(v => v >= 8 ? '#22c55e' : v >= 5 ? '#eab308' : '#ef4444'),
-                fill: true, tension: 0.4, spanGaps: true
-            }]
-        });
+        Analytics.resetChartState('chart-quality');
+        if (daysWithFood === 0) {
+            Analytics.renderNoData('chart-quality');
+        } else {
+            Analytics.drawChart('chart-quality', 'line', {
+                labels: labels,
+                datasets: [{
+                    label: 'Qualidade (1-10)',
+                    data: dataQuality,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    pointBackgroundColor: dataQuality.map(v => v >= 8 ? '#22c55e' : v >= 5 ? '#eab308' : '#ef4444'),
+                    fill: true, tension: 0.4, spanGaps: true
+                }]
+            });
+        }
 
         const feedbackEl = document.getElementById('quality-feedback');
         if (feedbackEl) {
@@ -246,26 +288,39 @@ export const Analytics = {
             }
         }
 
-        Analytics.drawChart('chart-exercise', 'bar', {
-            labels: labels,
-            datasets: [{
-                label: 'Queima (kcal)',
-                data: dataBurn,
-                backgroundColor: '#f59e0b',
-                borderRadius: 4
-            }]
-        });
+        Analytics.resetChartState('chart-exercise');
+        if (daysWithExercise === 0) {
+            Analytics.renderNoData('chart-exercise');
+        } else {
+            Analytics.drawChart('chart-exercise', 'bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'Queima (kcal)',
+                    data: dataBurn,
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 4
+                }]
+            });
+        }
 
-        Analytics.drawChart('chart-hydration', 'bar', {
-            labels: labels,
-            datasets: [{
-                label: 'Água (ml)',
-                data: dataHydration,
-                backgroundColor: '#0ea5e9',
-                borderRadius: 4
-            }]
-        });
+        Analytics.resetChartState('chart-hydration');
+        // Hydration data might exist even if food doesn't (from stats)
+        const hasHydration = dataHydration.some(v => v > 0);
+        if (!hasHydration) {
+            Analytics.renderNoData('chart-hydration');
+        } else {
+            Analytics.drawChart('chart-hydration', 'bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'Água (ml)',
+                    data: dataHydration,
+                    backgroundColor: '#0ea5e9',
+                    borderRadius: 4
+                }]
+            });
+        }
 
+        Analytics.resetChartState('chart-weight');
         Analytics.drawChart('chart-weight', 'line', {
             labels: labels,
             datasets: [{
@@ -888,6 +943,7 @@ export const Analytics = {
     },
 
     drawChart: (id, type, data, extraOptions = {}) => {
+        Analytics.resetChartState(id);
         const canvas = document.getElementById(id);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
