@@ -57,10 +57,10 @@ export const Planner = {
                     </div>
 
                     <div id="content-day-${index}" class="hidden p-4 space-y-4 border-t border-gray-100 dark:border-gray-700">
-                        ${Planner.renderMealRow(day.meals.breakfast, UI.getCategoryLabel('Café da Manhã'), 'coffee', index, 'breakfast')}
-                        ${Planner.renderMealRow(day.meals.lunch, UI.getCategoryLabel('Almoço'), 'utensils', index, 'lunch')}
-                        ${Planner.renderMealRow(day.meals.snack, UI.getCategoryLabel('Lanche'), 'apple-alt', index, 'snack')}
-                        ${Planner.renderMealRow(day.meals.dinner, UI.getCategoryLabel('Jantar'), 'moon', index, 'dinner')}
+                        ${Planner.renderMealRow(day.meals.breakfast, UI.getCategoryLabel('Café da Manhã'), 'Café da Manhã', 'coffee', index, 'breakfast')}
+                        ${Planner.renderMealRow(day.meals.lunch, UI.getCategoryLabel('Almoço'), 'Almoço', 'utensils', index, 'lunch')}
+                        ${Planner.renderMealRow(day.meals.snack, UI.getCategoryLabel('Lanche'), 'Lanche', 'apple-alt', index, 'snack')}
+                        ${Planner.renderMealRow(day.meals.dinner, UI.getCategoryLabel('Jantar'), 'Jantar', 'moon', index, 'dinner')}
                     </div>
                 </div>
             `;
@@ -70,7 +70,7 @@ export const Planner = {
         container.innerHTML = html;
     },
 
-    renderMealRow: (meal, label, icon, dayIndex, mealKey) => {
+    renderMealRow: (meal, label, rawCategory, icon, dayIndex, mealKey) => {
         if (!meal) return '';
         // Escape quotes for safety (single and double)
         const descSafe = meal.desc.replace(/"/g, '&quot;').replace(/'/g, "\\'");
@@ -90,7 +90,7 @@ export const Planner = {
                                 class="text-[10px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded hover:bg-yellow-200 transition">
                                 <i class="fas fa-bolt"></i>
                             </button>
-                            <button onclick="Planner.logMeal('${descSafe}', ${meal.estimated_cals}, '${label}')"
+                            <button onclick="Planner.logMeal('${descSafe}', ${meal.estimated_cals}, '${rawCategory}')"
                                 class="text-[10px] font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded hover:bg-brand-500 hover:text-white transition">
                                 ${I18n.t("planner.log_meal")}
                             </button>
