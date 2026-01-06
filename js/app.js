@@ -10,6 +10,7 @@ import { Context } from './services/context.js';
 import { Planner } from './ui/planner.js';
 import { Shopping } from './ui/shopping.js';
 import { Fasting } from './ui/fasting.js';
+import { I18n } from './services/i18n.js';
 
 // =========================================================================
 // 6. MAIN APP CONTROLLER
@@ -18,7 +19,8 @@ export const App = {
     reviewItems: [], // New state for multi-item review
 
     init: () => {
-        moment.locale('pt-br');
+        I18n.init(); // Initialize translations
+        moment.locale(I18n.locale.toLowerCase());
         // Register PWA Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error", err));
@@ -69,7 +71,7 @@ export const App = {
         const profileImg = document.getElementById('header-profile-img');
         if (profileImg) {
             profileImg.onclick = () => {
-                if(confirm("Deseja atualizar o sistema?")) {
+                if(confirm(I18n.t("alert.update_confirm"))) {
                     window.location.reload(true);
                 }
             };
@@ -943,7 +945,7 @@ export const App = {
         r.readAsText(file);
     },
     resetAll: () => {
-        if(confirm("Tem certeza que deseja apagar todos os dados?")) { localStorage.clear(); location.reload(); }
+        if(confirm(I18n.t("alert.reset_confirm"))) { localStorage.clear(); location.reload(); }
     }
 };
 
