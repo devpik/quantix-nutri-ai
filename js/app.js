@@ -112,6 +112,12 @@ export const App = {
         }
     },
 
+    toggleLanguage: () => {
+        const newLang = I18n.locale === 'pt-BR' ? 'en-US' : 'pt-BR';
+        I18n.setLocale(newLang);
+        App.refreshUI();
+    },
+
     // --- ONBOARDING LOGIC ---
     finishOnboarding: () => {
         const name = document.getElementById('onb-name').value;
@@ -181,6 +187,12 @@ export const App = {
     },
 
     refreshUI: () => {
+        // Update Language Button
+        const btnLang = document.getElementById('btn-lang-toggle');
+        if (btnLang) {
+            btnLang.innerText = I18n.locale === 'pt-BR' ? '🇧🇷' : '🇺🇸';
+        }
+
         if (!App.macroChart) App.initMacroChart();
         const today = DB.getTodayKey();
         const p = DB.getProfile();
